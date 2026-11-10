@@ -1,0 +1,40 @@
+{
+  "wowAddonsPath": "C:/Program Files (x86)/World of Warcraft/_classic_/Interface/AddOns",
+  "addons": [
+    {
+      "name": "Journey Guides",
+      "folderName": "Journey",
+      "sync": true,
+      "priority": "Alta",
+      "method": "C (Directivas intactas, traducir vista de ruta)"
+    },
+    {
+      "name": "Books on Map Forever",
+      "folderName": "BooksOnMapForever",
+      "sync": true,
+      "priority": "Media",
+      "method": "B (Coordenadas e IDs intactos, traducir notas)"
+    },
+    {
+      "name": "What's Training?",
+      "folderName": "WhatsTraining",
+      "sync": true,
+      "priority": "Baja",
+      "method": "A (Inyección de tabla esES)"
+    },
+    {
+      "name": "GearQuest Forever",
+      "folderName": "GearQuestForever",
+      "sync": true,
+      "priority": "Baja",
+      "method": "A (Inyección de tabla esES)"
+    },
+    {
+      "name": "MoveAnything",
+      "folderName": "MoveAnything",
+      "sync": false,
+      "priority": "Opcional",
+      "method": "A (Opcional)"
+    }
+  ]
+}
