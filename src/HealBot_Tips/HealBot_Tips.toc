@@ -1,0 +1,26 @@
+## Interface: 11509, 16001, 20506, 50504, 120105
+## Title: HealBot Tooltips
+## Title-esES: HealBot: Descripciones emergentes
+## Title-esMX: HealBot: Descripciones emergentes
+## Author: Strife
+## Notes: Show tooltips on HealBot frames and in HealBot options.
+## Notes-esES: Muestra descripciones emergentes en los marcos y en las opciones de HealBot.
+## Notes-esMX: Muestra descripciones emergentes en los marcos y en las opciones de HealBot.
+## RequiredDeps: HealBot
+## LoadOnDemand: 1
+## IconTexture: Interface\AddOns\HealBot\Images\HealBot.tga
+
+Locale\HealBot_Localization.en.lua
+HealBot_Tooltip.lua
+
+Locale\HealBot_Localization.br.lua
+Locale\HealBot_Localization.cn.lua
+Locale\HealBot_Localization.de.lua
+Locale\HealBot_Localization.es.lua
+Locale\HealBot_Localization.fr.lua
+Locale\HealBot_Localization.gr.lua
+Locale\HealBot_Localization.hu.lua
+Locale\HealBot_Localization.it.lua
+Locale\HealBot_Localization.kr.lua
+Locale\HealBot_Localization.ru.lua
+Locale\HealBot_Localization.tw.lua

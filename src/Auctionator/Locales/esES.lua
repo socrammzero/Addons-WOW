@@ -459,6 +459,12 @@ L["YOU_COLUMN"] = "¿Tú?"
 L["YOUR_HISTORY"] = "Tu historial"
 L["PAST_AUTHOR_HEADER"] = "Autor anterior"
 L["SUPPORT_HEADER"] = "Obtener soporte"
+L["SET_VALUE_SUFFIX"] = "Rebaja"
+L["PERCENTAGE_TOOLTIP_TEXT"] = "El porcentaje de rebaja que se utilizará para calcular el precio de venta. Por ejemplo, un valor de 5 significa que tu objeto se publicará a un 5% menos que el precio más bajo actual."
+L["UNDERCUT_TOOLTIP_TEXT"] = "El valor de rebaja que se utilizará para calcular el precio de venta."
+L["ROADMAP_TOOLTIP_TEXT"] = "La hoja de ruta técnica define el trabajo planificado para las próximas versiones de Auctionator. ¡Consulta aquí el progreso hacia tu característica favorita!"
+L["NEXT_SCAN_MESSAGE"] = "Se puede iniciar un escaneo completo en %s minutos y %s segundos."
+L["LIST_ADD_ITEM_HEADER"] = "Añadir objeto a la lista de compras"
 
 
   return L

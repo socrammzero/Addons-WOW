@@ -1,6 +1,10 @@
 ## Interface: 120100, 120105, 16001, 50504, 38001, 20506, 11509
 ## ExcludeLoadGameType: wowhack
 ## Title: Baganator
+## Title-esES: Baganator
+## Title-esMX: Baganator
+## Notes-esES: Gestor de inventario y bolsas para World of Warcraft.
+## Notes-esMX: Gestor de inventario y bolsas para World of Warcraft.
 ## Version: 846
 ## Author: plusmouse
 ## OptionalDeps: Syndicator, Masque

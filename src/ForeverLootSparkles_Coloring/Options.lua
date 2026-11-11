@@ -531,7 +531,7 @@ SlashCmdList.FLSCOLOR = function(message)
 			return;
 		end
 	end
-	print("|cffffd200Forever Loot Sparkles - Herbs & Ores:|r " .. L.OPEN_HINT);
+	print("|cffffd200Forever Loot Sparkles - Hierbas y minerales:|r " .. L.OPEN_HINT);
 end
 
 -- Forever Loot Sparkles 2.x dropped the herb/ore/corpse/quest sparkles;

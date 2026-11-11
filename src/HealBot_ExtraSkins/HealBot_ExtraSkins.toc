@@ -1,0 +1,14 @@
+## Interface: 11509, 16001, 20506, 50504, 120105
+## Title: HealBot Extra Skins
+## Title-esES: HealBot: Apariencias adicionales
+## Title-esMX: HealBot: Apariencias adicionales
+## Author: Strife
+## Notes: Large store of extra skins for HealBot.
+## Notes-esES: Amplia colección de apariencias adicionales para HealBot.
+## Notes-esMX: Amplia colección de apariencias adicionales para HealBot.
+## RequiredDeps: HealBot
+## LoadOnDemand: 1
+## IconTexture: Interface\AddOns\HealBot\Images\HealBot.tga
+
+HealBot_ExtraSkins.lua
+

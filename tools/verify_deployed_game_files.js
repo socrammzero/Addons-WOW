@@ -37,3 +37,12 @@ console.log('Leatrix_Plus in game has Mount ID in esES:', lp.split('if GameLocal
 
 const jGo = fs.readFileSync('D:/World of Warcraft/_forever_/Interface/AddOns/Journey/data/GameObjectNames/GameObjectNames-esES.lua', 'utf8');
 console.log('Journey GameObjectNames-esES in game has 0 bracketed objects:', !jGo.includes('"['));
+
+const hbe = fs.readFileSync('D:/World of Warcraft/_forever_/Interface/AddOns/HealBot_ExtraSkins/HealBot_ExtraSkins.lua', 'utf8');
+console.log('HealBot_ExtraSkins in game has HealBot_ExtraSkins_Lang_es:', hbe.includes('function HealBot_ExtraSkins_Lang_es()'));
+
+const hbt = fs.readFileSync('D:/World of Warcraft/_forever_/Interface/AddOns/HealBot_Tips/Locale/HealBot_Localization.es.lua', 'utf8');
+console.log('HealBot_Tips in game has HealBot_Lang_Options_esALL:', hbt.includes('function HealBot_Lang_Options_esALL()') && hbt.includes('HEALBOT_OPTIONS_HELP_TEXT='));
+
+const hba = fs.readFileSync('D:/World of Warcraft/_forever_/Interface/AddOns/HealBot/Healbot_Aura.lua', 'utf8');
+console.log('HealBot Aura in game has Spanish combat messages:', hba.includes('necesita') && hba.includes('sufre de'));

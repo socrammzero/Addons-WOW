@@ -136,6 +136,27 @@
       "name": "GearQuestForever_WARRIOR",
       "sync": true,
       "description": "Datos de clase (Guerrero) para GearQuest Forever."
+    },
+    {
+      "name": "HealBot Continued",
+      "folderName": "HealBot",
+      "sync": true,
+      "priority": "Alta",
+      "method": "A (Localización completa esES/esMX)"
+    },
+    {
+      "name": "HealBot Extra Skins",
+      "folderName": "HealBot_ExtraSkins",
+      "sync": true,
+      "priority": "Media",
+      "method": "A (Descripciones de apariencias en español)"
+    },
+    {
+      "name": "HealBot Tooltips",
+      "folderName": "HealBot_Tips",
+      "sync": true,
+      "priority": "Alta",
+      "method": "A (Descripciones emergentes y ayuda en español)"
     }
   ]
 }

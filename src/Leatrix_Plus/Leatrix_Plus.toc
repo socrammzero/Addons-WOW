@@ -1,7 +1,11 @@
 ## Interface: 16001
 
 ## Title: Leatrix Plus
+## Title-esES: Leatrix Plus
+## Title-esMX: Leatrix Plus
 ## Notes: curseforge.com/wow/addons/leatrix-plus
+## Notes-esES: Calidad de vida y mejoras para World of Warcraft.
+## Notes-esMX: Calidad de vida y mejoras para World of Warcraft.
 
 ## Version: 1.60.29
 ## Author: Leatrix
