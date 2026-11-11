@@ -425,10 +425,10 @@ end
 function ShowTooltip(button)
     GuideTooltip:SetOwner(frame, "ANCHOR_NONE")
     GuideTooltip:AddLine(button.opts.text)
-    if (type(button.opts.tooltip) == "function") then
-        GuideTooltip:AddLine(button.opts.tooltip(), 1, 1, 1, true)
-    else
-        GuideTooltip:AddLine(button.opts.tooltip, 1, 1, 1, true)
+    local rawTip = type(button.opts.tooltip) == "function" and button.opts.tooltip() or button.opts.tooltip
+    if (rawTip) then
+        local localizedTip = L[rawTip] or rawTip
+        GuideTooltip:AddLine(localizedTip, 1, 1, 1, true)
     end
     GuideTooltip:SetPoint("LEFT", button, "RIGHT", 12, 0)
     GuideTooltip:Show()
