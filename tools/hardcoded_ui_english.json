@@ -1,0 +1,722 @@
+[
+  {
+    "file": "src/Journey/Brand-Ext.lua",
+    "string": "Journey Guide Manager"
+  },
+  {
+    "file": "src/Journey/Debug.lua",
+    "string": "Guide ID: %s\\n"
+  },
+  {
+    "file": "src/Journey/Debug.lua",
+    "string": "Guide Version: %s\\n"
+  },
+  {
+    "file": "src/Journey/GuideModules.lua",
+    "string": "The Burning Crusade"
+  },
+  {
+    "file": "src/Journey/GuideModules.lua",
+    "string": "Wrath of the Lich King"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "ArrowLabelFont"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "ScreenArrow"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "arrow-atlas.png"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "arrow-spin-atlas.png"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "ArrowLabelFont"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "ArrowLabelFont"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "ArrowLabelFont"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "ArrowLabelFont"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "Arrow-Mask"
+  },
+  {
+    "file": "src/Journey/lib/TomCats/Arrows.lua",
+    "string": "Arrow-Shadow"
+  },
+  {
+    "file": "src/Journey/mixins/ActionButton.lua",
+    "string": "the item"
+  },
+  {
+    "file": "src/Journey/mixins/ActionButton.lua",
+    "string": "GuideContainer"
+  },
+  {
+    "file": "src/Journey/mixins/ActionButton.lua",
+    "string": "item:%s"
+  },
+  {
+    "file": "src/Journey/mixins/Location.lua",
+    "string": "Follow Waypoint"
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": "X-Min-Guide-Version"
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": "ExternalGuides"
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": "BundledGuides"
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": "BundledGuides"
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": "Please re-run the "
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": " to\\nfinish setting up your guides."
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": "Click Reload, and when prompted,\\nre-run the "
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": "You can complete your guide installation\\nwhen Battle.net comes back online."
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": "Please re-run the "
+  },
+  {
+    "file": "src/Journey/services/Catalog.lua",
+    "string": " to\\nfinish setting up your guides."
+  },
+  {
+    "file": "src/Journey/services/Evaluation.lua",
+    "string": "completed"
+  },
+  {
+    "file": "src/Journey/services/Guide.lua",
+    "string": " Manager to refresh your guides."
+  },
+  {
+    "file": "src/Journey/services/Guide.lua",
+    "string": "GuideInfo is not present: %s"
+  },
+  {
+    "file": "src/Journey/services/GuideNavigation.lua",
+    "string": "talentTrainerVisited"
+  },
+  {
+    "file": "src/Journey/services/GuideNavigation.lua",
+    "string": "tradeskillTrainerVisited"
+  },
+  {
+    "file": "src/Journey/services/Header.lua",
+    "string": "Click cogwheel to load a guide"
+  },
+  {
+    "file": "src/Journey/services/LocationsInit.lua",
+    "string": "Around the area"
+  },
+  {
+    "file": "src/Journey/services/QuestText.lua",
+    "string": "On the way, "
+  },
+  {
+    "file": "src/Journey/services/QuestText.lua",
+    "string": "click on "
+  },
+  {
+    "file": "src/Journey/services/QuestText.lua",
+    "string": "speak to "
+  },
+  {
+    "file": "src/Journey/services/QuestText.lua",
+    "string": "go to the waypoint"
+  },
+  {
+    "file": "src/Journey/services/QuestText.lua",
+    "string": "Click on "
+  },
+  {
+    "file": "src/Journey/services/QuestText.lua",
+    "string": "Speak to "
+  },
+  {
+    "file": "src/Journey/services/QuestText.lua",
+    "string": "Go to the waypoint"
+  },
+  {
+    "file": "src/Journey/services/QuestText.lua",
+    "string": ", and then click on "
+  },
+  {
+    "file": "src/Journey/services/QuestText.lua",
+    "string": " around the area"
+  },
+  {
+    "file": "src/Journey/services/Runes.lua",
+    "string": "<Click to view the guide>"
+  },
+  {
+    "file": "src/Journey/services/Runes.lua",
+    "string": "(Guide not yet available)"
+  },
+  {
+    "file": "src/Journey/services/Runes.lua",
+    "string": "<Shift-Click to reveal the name>"
+  },
+  {
+    "file": "src/Journey/services/Runes.lua",
+    "string": "<Click to view the guide>"
+  },
+  {
+    "file": "src/Journey/services/Runes.lua",
+    "string": "(Guide not yet available)"
+  },
+  {
+    "file": "src/Journey/services/Runes.lua",
+    "string": "<Shift-Click to reveal spell info>"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "Joana's Guide: debug on"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "Joana's Guide: debug off"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "validate guides"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "blob next"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "Show the guide interface: %s show"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "Hide the guide interface: %s hide"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "Enable the minimap button: %s enable"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "Disable the minimap button: %s disable"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "Next step: %s next"
+  },
+  {
+    "file": "src/Journey/SlashCommands.lua",
+    "string": "Go to step in current guide: %s goto ##-##"
+  },
+  {
+    "file": "src/Journey/State.lua",
+    "string": "returnToLevelingGuide"
+  },
+  {
+    "file": "src/Journey/State.lua",
+    "string": "returnToRuneGuide"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "ConfigurationWindow"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Advanced Options"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Cannot be turned off when playing on official Hardcore servers. This is for your own safety"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Effectively takes out death warps and makes your journey through Azeroth safer.\\n\\n(setting saved per character)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "When checked, steps requiring a group are included in the guide.\\n\\nAlthough the official Hardcore servers allow this, disabling the option is useful if you are playing with a more strict unofficial hardcore ruleset.\\n\\n(setting saved per character)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "When checked, steps involving use of the auction house and mailbox are included in the guide.\\n\\nAlthough the official Hardcore servers allow this, disabling the option is useful if you are playing with a more strict unofficial hardcore ruleset.\\n\\n(setting saved per character)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Automatically Accept and Turn-In Quests"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Automatically Make Inns Your Home"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "On steps where the guide is instructing you to do so, the addon will automatically make the inn your home (set hearthstone location) when you interact with any innkeeper.\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Automatically Bank Items"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "When you access the bank while on a step that requires depositing or withdrawing items, the addon will automatically do it for you.\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Automatically Take Flights"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "From the Flight Masters.\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Sound on Objective Completion"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "\\\"Work Complete\\\" sound when completing things\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Show Step ID"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Shown underneath addon, the Step ID is a mirror from the web guides. Also use the Step ID to report bugs.\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Shown above addon, the Step ID is a mirror from the web guides. Also use the Step ID to report bugs.\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Hotkeys are assigned via the buttons from the top down in the addon and can dynamically change during a step\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Animate the minimap ping when showing the location of the current waypoint\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Enable HUD Waypoint Arrow"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Enable HUD Waypoint Arrow"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Display a large on-screen arrow pointing toward the current waypoint\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Use TomTom (when available) as the HUD Arrow"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Use TomTom (when available) as the HUD Arrow"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Use TomTom's arrow instead of the built-in arrow\\n\\n(requires TomTom to be installed and enabled)\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Arrow Size:"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Arrow Size:"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Arrow Text Size:"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Arrow Text Size:"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Automatically Mark Targeted NPCs"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Raid symbol will appear above selected targets\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Hide Guide When in Instances"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "When checked, the guide will be hidden automatically when you enter an instance\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Target Sound Alert:"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Sound only plays on certain targets\\n\\n(setting saved account-wide)"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Guide Size:"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "Guide Size:"
+  },
+  {
+    "file": "src/Journey/ui/ConfigurationWindow.lua",
+    "string": "SoundDropDownButton1"
+  },
+  {
+    "file": "src/Journey/ui/DefaultTaskGroupContainer.lua",
+    "string": "Please report the issue support and be sure to provide the following info:\\n\\n%s"
+  },
+  {
+    "file": "src/Journey/ui/GuideContainer.lua",
+    "string": "GuideContainer"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "GuideMenu"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Classic Era Guides"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Classic Era Guides"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Classic Era Guides (Fallback)"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Classic Era Guides"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Classic Era Guides"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": " Guides"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": " Guides"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "\\nto update your guides."
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Press Ctrl-C to copy the link"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "\\n(This guide is FREE!)"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Press Ctrl-C to copy the link"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Recommended Guide"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Recommended Guides"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Options"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Hide Guide"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Lock Window"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Resume Rune Guide"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Resume Leveling Guide"
+  },
+  {
+    "file": "src/Journey/ui/GuideMenu.lua",
+    "string": "Advanced Options"
+  },
+  {
+    "file": "src/Journey/ui/GuideTooltip.lua",
+    "string": "GuideTooltip"
+  },
+  {
+    "file": "src/Journey/ui/GuideTooltip.lua",
+    "string": "GuideTooltip"
+  },
+  {
+    "file": "src/Journey/ui/GuideTooltip.lua",
+    "string": "OnTooltipSetItem"
+  },
+  {
+    "file": "src/Journey/ui/GuideTooltip.lua",
+    "string": "OnTooltipSetSpell"
+  },
+  {
+    "file": "src/Journey/ui/GuideTooltip.lua",
+    "string": "OnHide"
+  },
+  {
+    "file": "src/Journey/ui/GuideTooltip.lua",
+    "string": "Also Targeting:"
+  },
+  {
+    "file": "src/Journey/ui/Header.lua",
+    "string": "auctionhouse-itemicon-border-artifact"
+  },
+  {
+    "file": "src/Journey/ui/HeaderBackButton.lua",
+    "string": "UI-SquareButton-Left-Disabled"
+  },
+  {
+    "file": "src/Journey/ui/HeaderNextButton.lua",
+    "string": "HeaderNextButton"
+  },
+  {
+    "file": "src/Journey/ui/HeaderNextButton.lua",
+    "string": "UI-SquareButton-Right-Disabled"
+  },
+  {
+    "file": "src/Journey/ui/HeaderSettingsButton.lua",
+    "string": "HeaderSettingsButton"
+  },
+  {
+    "file": "src/Journey/ui/hyperlinks/Quest.lua",
+    "string": "You are on this quest"
+  },
+  {
+    "file": "src/Journey/ui/map/MapBlobOverlay.lua",
+    "string": "Interface\\\\WorldMap\\\\UI-QuestBlob-Inside"
+  },
+  {
+    "file": "src/Journey/ui/map/MapBlobOverlay.lua",
+    "string": "Interface\\\\WorldMap\\\\UI-QuestBlob-Outside"
+  },
+  {
+    "file": "src/Journey/ui/map/MapBlobOverlay.lua",
+    "string": "CreateZoomLevels"
+  },
+  {
+    "file": "src/Journey/ui/MenuButton.lua",
+    "string": "GameFontDisableTiny2"
+  },
+  {
+    "file": "src/Journey/ui/MenuButton.lua",
+    "string": "GameFontDisableSmallLeft"
+  },
+  {
+    "file": "src/Journey/ui/Target.lua",
+    "string": "TargetMarker"
+  },
+  {
+    "file": "src/Journey/ui/Target.lua",
+    "string": "target"
+  },
+  {
+    "file": "src/Journey/ui/TaskContainers.lua",
+    "string": "OnShow"
+  },
+  {
+    "file": "src/Journey/ui/TaskContainers.lua",
+    "string": "OnEnable"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Accept.lua",
+    "string": "accept"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Accept.lua",
+    "string": "questnormal"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Accept.lua",
+    "string": "accept"
+  },
+  {
+    "file": "src/Journey/ui/tasks/AcceptOne.lua",
+    "string": "acceptone"
+  },
+  {
+    "file": "src/Journey/ui/tasks/AcceptOne.lua",
+    "string": "questnormal"
+  },
+  {
+    "file": "src/Journey/ui/tasks/AcceptOne.lua",
+    "string": "accept"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Complete.lua",
+    "string": "complete"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Complete.lua",
+    "string": "worldquest-icon-pvp-ffa"
+  },
+  {
+    "file": "src/Journey/ui/tasks/DoQuestMixin.lua",
+    "string": "You don't have this quest"
+  },
+  {
+    "file": "src/Journey/ui/tasks/DoQuestMixin.lua",
+    "string": "You don't have this quest"
+  },
+  {
+    "file": "src/Journey/ui/tasks/DoQuestMixin.lua",
+    "string": "minimaparrow"
+  },
+  {
+    "file": "src/Journey/ui/tasks/GetItem.lua",
+    "string": "getitem"
+  },
+  {
+    "file": "src/Journey/ui/tasks/HintButton.lua",
+    "string": "Show a Hint"
+  },
+  {
+    "file": "src/Journey/ui/tasks/HintButton.lua",
+    "string": "Show Spoiler"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Merchant.lua",
+    "string": "Get your main pet out of the stable"
+  },
+  {
+    "file": "src/Journey/ui/tasks/NPC.lua",
+    "string": "Click on %s%s."
+  },
+  {
+    "file": "src/Journey/ui/tasks/NPC.lua",
+    "string": "Speak to %s%s."
+  },
+  {
+    "file": "src/Journey/ui/tasks/Prereqs.lua",
+    "string": "You're missing some prerequisites to start this chapter. Go to the previous guide and we'll try to find the right place for you to start."
+  },
+  {
+    "file": "src/Journey/ui/tasks/SpiritRes.lua",
+    "string": "Res at the Spirit Healer (Release Spirit)"
+  },
+  {
+    "file": "src/Journey/ui/tasks/SpiritRes.lua",
+    "string": "Res at the Spirit Healer"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Turnin.lua",
+    "string": "questturnin"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Turnin.lua",
+    "string": "You don't have this quest"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Turnin.lua",
+    "string": "You don't have this quest"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Turnin.lua",
+    "string": "Quest is not ready to be turned in"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Turnin.lua",
+    "string": "Quest is not ready to be turned in"
+  },
+  {
+    "file": "src/Journey/ui/tasks/Withdraw.lua",
+    "string": "Withdraw from the bank:"
+  },
+  {
+    "file": "src/Journey/ui/TieredMenu.lua",
+    "string": "OnHide"
+  },
+  {
+    "file": "src/Journey/Validator.lua",
+    "string": "Guide#"
+  },
+  {
+    "file": "src/Journey/Validator.lua",
+    "string": "Guide#"
+  },
+  {
+    "file": "src/Journey/Validator.lua",
+    "string": "Guide#"
+  },
+  {
+    "file": "src/Journey/Validator.lua",
+    "string": "Invalid completed @ "
+  },
+  {
+    "file": "src/Journey/Validator.lua",
+    "string": " completeds"
+  },
+  {
+    "file": "src/Journey/Validator.lua",
+    "string": "Checking guides for errors"
+  },
+  {
+    "file": "src/Journey/Validator.lua",
+    "string": " guides"
+  },
+  {
+    "file": "src/Journey/Validator.lua",
+    "string": " completeds"
+  }
+]
