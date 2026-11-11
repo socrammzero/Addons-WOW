@@ -21,7 +21,7 @@ end
 
 function Hyperlinks.GetItemHyperlink(itemRef)
     local itemID = itemRef.item or itemRef.getitem
-    local name = itemRef.label or Names.GetName(GetItemInfo, itemID)
+    local name = (itemRef.label and (L[itemRef.label] or itemRef.label)) or Names.GetName(GetItemInfo, itemID)
     return string.format("|Hitem:%s:%s|h%s|h", itemID, Hyperlinks.CreateReference(itemRef), name)
 end
 

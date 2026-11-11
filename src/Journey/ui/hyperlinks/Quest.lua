@@ -29,11 +29,11 @@ local function TooltipShow(frame, questRef, refType)
             local heading = L["Note:"] or "Note:"
             GuideTooltip:AddLine(string.format("|c%s%s|r", Color.NOTE_HEADING, heading))
         end
-        GuideTooltip:AddLine(questRef.note, 1, 1, 1, true)
+        GuideTooltip:AddLine(L[questRef.note] or questRef.note, 1, 1, 1, true)
     end
     if (questRef.warn) then
         GuideTooltip:AddLine(" ")
-        GuideTooltip:AddLine(string.format("|A:services-icon-warning:16:16|a %s", questRef.warn))
+        GuideTooltip:AddLine(string.format("|A:services-icon-warning:16:16|a %s", L[questRef.warn] or questRef.warn))
     end
     GuideTooltip:Show()
 end
@@ -44,7 +44,7 @@ end
 
 function Hyperlinks.GetQuestHyperlink(questRef, refType)
     local questName = Names.GetQuestName(questRef[refType])
-    local name = questRef.label or questName
+    local name = (questRef.label and (L[questRef.label] or questRef.label)) or questName
     return string.format("|Hquest:%s:%s:%s|h%s|h", questRef[refType], Hyperlinks.CreateReference(questRef), refType, name)
 end
 

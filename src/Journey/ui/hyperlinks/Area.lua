@@ -13,7 +13,7 @@ function Hyperlinks.GetAreaHyperlink(areaRef)
     if (not areaRef.label) then
         return Names.GetName(C_Map.GetAreaInfo, areaRef.area)
     end
-    return string.format("|Harea:%s:%s|h%s|h", areaRef.area, Hyperlinks.CreateReference(areaRef), areaRef.label)
+    return string.format("|Harea:%s:%s|h%s|h", areaRef.area, Hyperlinks.CreateReference(areaRef), L[areaRef.label] or areaRef.label)
 end
 
 Hyperlinks.RegisterHyperlinkType("area", nil, Hyperlinks.OnEnterTooltipFunc, Hyperlinks.OnLeaveTooltipFunc, TooltipShow)

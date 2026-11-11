@@ -42,6 +42,100 @@
       "sync": true,
       "priority": "Opcional",
       "method": "A (Opcional)"
+    },
+    {
+      "name": "Forever Loot Sparkles",
+      "folderName": "ForeverLootSparkles",
+      "sync": true,
+      "priority": "Media",
+      "method": "A (Localización esES)"
+    },
+    {
+      "name": "Forever Loot Sparkles - Herbs & Ores",
+      "folderName": "ForeverLootSparkles_Coloring",
+      "sync": true,
+      "priority": "Media",
+      "method": "A (Localización esES)"
+    },
+    {
+      "name": "Auctionator",
+      "folderName": "Auctionator",
+      "sync": true,
+      "priority": "Media",
+      "method": "A (Localización esES)"
+    },
+    {
+      "name": "Baganator",
+      "folderName": "Baganator",
+      "sync": true,
+      "priority": "Media",
+      "method": "A (Localización esES)"
+    },
+    {
+      "name": "Syndicator",
+      "folderName": "Syndicator",
+      "sync": true,
+      "priority": "Media",
+      "method": "A (Localización esES)"
+    },
+    {
+      "name": "Leatrix Maps",
+      "folderName": "Leatrix_Maps",
+      "sync": true,
+      "priority": "Media",
+      "method": "A (Localización esES)"
+    },
+    {
+      "name": "Leatrix Plus",
+      "folderName": "Leatrix_Plus",
+      "sync": true,
+      "priority": "Media",
+      "method": "A (Localización esES)"
+    },
+    {
+      "name": "GearQuestForever_DRUID",
+      "sync": true,
+      "description": "Datos de clase (Druida) para GearQuest Forever."
+    },
+    {
+      "name": "GearQuestForever_HUNTER",
+      "sync": true,
+      "description": "Datos de clase (Cazador) para GearQuest Forever."
+    },
+    {
+      "name": "GearQuestForever_MAGE",
+      "sync": true,
+      "description": "Datos de clase (Mago) para GearQuest Forever."
+    },
+    {
+      "name": "GearQuestForever_PALADIN",
+      "sync": true,
+      "description": "Datos de clase (Paladín) para GearQuest Forever."
+    },
+    {
+      "name": "GearQuestForever_PRIEST",
+      "sync": true,
+      "description": "Datos de clase (Sacerdote) para GearQuest Forever."
+    },
+    {
+      "name": "GearQuestForever_ROGUE",
+      "sync": true,
+      "description": "Datos de clase (Pícaro) para GearQuest Forever."
+    },
+    {
+      "name": "GearQuestForever_SHAMAN",
+      "sync": true,
+      "description": "Datos de clase (Chamán) para GearQuest Forever."
+    },
+    {
+      "name": "GearQuestForever_WARLOCK",
+      "sync": true,
+      "description": "Datos de clase (Brujo) para GearQuest Forever."
+    },
+    {
+      "name": "GearQuestForever_WARRIOR",
+      "sync": true,
+      "description": "Datos de clase (Guerrero) para GearQuest Forever."
     }
   ]
 }

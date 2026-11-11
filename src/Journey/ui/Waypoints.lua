@@ -43,7 +43,7 @@ function component.Update()
 						y = mapPosition.y * 100,
 						map = location.mapID,
 						GetTooltipLabel = function()
-							return "Spirit Healer"
+							return L["Spirit Healer"]
 						end,
 						IsNavigationSuppressed = function()
 							return false

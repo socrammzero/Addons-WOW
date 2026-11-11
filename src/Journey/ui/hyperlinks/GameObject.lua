@@ -14,9 +14,9 @@ local function OnClick(frame, objectRef)
 end
 
 function Hyperlinks.GetGameObjectHyperlink(objectRef)
-    local name = objectRef.label
+    local name = objectRef.label and (L[objectRef.label] or objectRef.label)
     if (not name and type(objectRef.gameobject) == "string") then
-        name = objectRef.gameobject
+        name = L[objectRef.gameobject] or objectRef.gameobject
     elseif (not name) then
         name = Names.GetGameObjectName(objectRef.gameobject)
     end

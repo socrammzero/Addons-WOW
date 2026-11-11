@@ -363,7 +363,7 @@ for _, v in ipairs(maps) do
 			GameTooltip:ClearLines()
 			GameTooltip:SetOwner(self, "ANCHOR_NONE")
 			GameTooltip:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, 0)
-			GameTooltip:SetText("Spirit Healer", 1, 1, 1)
+			GameTooltip:SetText(L["Spirit Healer"], 1, 1, 1)
 			GameTooltip:Show()
 		end)
 		spiritHealerPin:SetScript("OnLeave", function()

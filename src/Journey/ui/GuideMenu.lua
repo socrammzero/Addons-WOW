@@ -14,9 +14,9 @@ end
 
 local function getSectionHeading(prefix, hasForever)
 	if (prefix == "Classic Era" and hasForever) then
-		return L["Classic Era Guides"] and (L["Classic Era Guides"] .. " (Fallback)") or "Classic Era Guides (Fallback)"
+		return L["Classic Era Guides"] and (L["Classic Era Guides"] .. " (Alternativa)") or "Guías Classic Era (Alternativa)"
 	elseif (prefix == "Classic Era") then
-		return L["Classic Era Guides"] or "Classic Era Guides"
+		return L["Classic Era Guides"] or "Guías Classic Era"
 	else
 		return L[prefix .. " Guides"] or (prefix .. " Guides")
 	end
@@ -106,24 +106,24 @@ local function createGuideMenu()
 							if (GuideModules.IsExpired()) then
 								TogglePopup(
 									nil, nil, nil, nil, nil,
-									"|cFFFF0000UPDATE REQUIRED:|r\n\n|cFFFFD100" .. addonTitle .. "|r\n\nPlease update your addon"
+									"|cFFFF0000ACTUALIZACIÓN NECESARIA:|r\n\n|cFFFFD100" .. addonTitle .. "|r\n\nPor favor, actualiza tu addon"
 								)
 							elseif (incompatibleReason == "addon") then
 								TogglePopup(
 									nil, nil, nil, nil, nil,
-									"|cFFFF0000INCOMPATIBLE:|r\n\n|cFFFFD100" .. addonTitle .. "|r\n\nPlease update your addon"
+									"|cFFFF0000INCOMPATIBLE:|r\n\n|cFFFFD100" .. addonTitle .. "|r\n\nPor favor, actualiza tu addon"
 								)
 							elseif (incompatibleReason == "guide") then
 								TogglePopup(
 									nil, nil, nil, nil, nil,
-									"|cFFFF0000GUIDE UPDATE REQUIRED:|r\n\n|cFFFFD100" .. addonTitle .. "|r\n\nYour guide data is outdated.\nPlease run the " .. Brand.installerName .. "\nto update your guides."
+									"|cFFFF0000ACTUALIZACIÓN DE GUÍA NECESARIA:|r\n\n|cFFFFD100" .. addonTitle .. "|r\n\nLos datos de tus guías están desactualizados.\nPor favor, ejecuta " .. Brand.installerName .. "\npara actualizar tus guías."
 								)
 							elseif (GuideModules.HasLegacyModules()) then
 								TogglePopup(
 									Brand.website,
-									"Press Ctrl-C to copy the link",
+									"Pulsa Ctrl-C para copiar el enlace",
 									nil, nil, nil,
-									"|cFFFF0000GUIDE UPDATE REQUIRED:|r\n\n|cFFFFD100" .. addonTitle .. "|r\n\nYour installed guides are not compatible\nwith this version of the addon.\n\nPlease visit our website to get the update:"
+									"|cFFFF0000ACTUALIZACIÓN DE GUÍA NECESARIA:|r\n\n|cFFFFD100" .. addonTitle .. "|r\n\nLas guías instaladas no son compatibles\ncon esta versión del addon.\n\nPor favor, visita nuestra web para obtener la actualización:"
 								)
 							else
 								-- D folder may have been installed since the menu was built
@@ -132,12 +132,12 @@ local function createGuideMenu()
 									GuideNavigationService.SetSeeking(true)
 									GuideNavigationService.Goto(guideInfo.guideID)
 								else
-									local freeText = Flags.HasFlag(guideInfo, "F") and "\n(This guide is FREE!)" or ""
+									local freeText = Flags.HasFlag(guideInfo, "F") and "\n(¡Esta guía es GRATIS!)" or ""
 									TogglePopup(
 										Brand.website,
-										"Press Ctrl-C to copy the link",
+										"Pulsa Ctrl-C para copiar el enlace",
 										nil, nil, nil,
-										string.format("|cFFFF0000GUIDE NOT INSTALLED:|r\n\n|cFFFFD100%s|r" .. freeText .. "\n\nVisit our website to get it:", guideInfo.description)
+										string.format("|cFFFF0000GUÍA NO INSTALADA:|r\n\n|cFFFFD100%s|r" .. freeText .. "\n\nVisita nuestra web para conseguirla:", guideInfo.description)
 									)
 								end
 							end
@@ -146,8 +146,8 @@ local function createGuideMenu()
 					end,
 					guideInfo = guideInfo
 				}
-				guideMenuItem.tooltipTitle = (not installed and "Not Installed")
-						or (not compatible and "Incompatible version (please update)")
+				guideMenuItem.tooltipTitle = (not installed and "No instalada")
+						or (not compatible and "Versión incompatible (por favor actualiza)")
 				if (not guideMenuItem.tooltipTitle) then
 					guideMenuItem.tooltipTitle = guideInfo.tooltipTitle
 					guideMenuItem.tooltipText = guideInfo.tooltipText
@@ -167,7 +167,7 @@ local function createGuideMenu()
 		for i = #recommendedMenuData, 1, -1 do
 			local menuItem = CreateFromMixins(recommendedMenuData[i])
 			if (idx > 1 and Flags.HasFlag(menuItem.guideInfo, "S")) then
-				menuItem.text = menuItem.text .. " |cFFBEF4A4(safer)|r"
+				menuItem.text = menuItem.text .. " |cFFBEF4A4(más segura)|r"
 			end
 			table.insert(
 					menuData,

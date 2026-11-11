@@ -29,33 +29,33 @@ function OnEnter(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 		local hasGuide = SkillLineAbilityGuideLUT[self.skillLineAbilityID]
 		if (spoilerLevel == 0) then
-			GameTooltip:SetText("Mysterious Rune")
-			GameTooltip:AddLine("You have not collected this rune", 1, 0, 0, true)
+			GameTooltip:SetText("Runa misteriosa")
+			GameTooltip:AddLine("No has conseguido esta runa", 1, 0, 0, true)
 			if (hasGuide) then
-				GameTooltip:AddLine("<Click to view the guide>", 0, 1, 0, true)
+				GameTooltip:AddLine("<Haz clic para ver la guía>", 0, 1, 0, true)
 			else
-				GameTooltip:AddLine("(Guide not yet available)", 0.5, 0.5, 0.5, true)
+				GameTooltip:AddLine("(Guía aún no disponible)", 0.5, 0.5, 0.5, true)
 			end
-			GameTooltip:AddLine("<Shift-Click to reveal the name>", 0, 1, 0, true)
+			GameTooltip:AddLine("<Mayús-clic para revelar el nombre>", 0, 1, 0, true)
 			GameTooltip:Show()
 		elseif (spoilerLevel == 1) then
 			local spellName = GetSpellInfo(SkillLineAbilitySpellLUT[self.skillLineAbilityID])
 			GameTooltip:SetText(spellName)
-			GameTooltip:AddLine("You have not collected this rune", 1, 0, 0, true)
+			GameTooltip:AddLine("No has conseguido esta runa", 1, 0, 0, true)
 			if (hasGuide) then
-				GameTooltip:AddLine("<Click to view the guide>", 0, 1, 0, true)
+				GameTooltip:AddLine("<Haz clic para ver la guía>", 0, 1, 0, true)
 			else
-				GameTooltip:AddLine("(Guide not yet available)", 0.5, 0.5, 0.5, true)
+				GameTooltip:AddLine("(Guía aún no disponible)", 0.5, 0.5, 0.5, true)
 			end
-			GameTooltip:AddLine("<Shift-Click to reveal spell info>", 0, 1, 0, true)
+			GameTooltip:AddLine("<Mayús-clic para revelar la información del hechizo>", 0, 1, 0, true)
 			GameTooltip:Show()
 		elseif (spoilerLevel == 2) then
 			GameTooltip:SetEngravingRune(self.skillLineAbilityID);
 			if (not GameTooltipTextLeft3:GetText()) then
 				if (hasGuide) then
-					GameTooltipTextLeft2:SetText("|cFFFF0000You have not collected this rune|r\n|cFF00FF00<Click to view the the guide>|r")
+					GameTooltipTextLeft2:SetText("|cFFFF0000No has conseguido esta runa|r\n|cFF00FF00<Haz clic para ver la guía>|r")
 				else
-					GameTooltipTextLeft2:SetText("|cFFFF0000You have not collected this rune|r\n|cFF808080(Guide not yet available)|r")
+					GameTooltipTextLeft2:SetText("|cFFFF0000No has conseguido esta runa|r\n|cFF808080(Guía aún no disponible)|r")
 				end
 				C_Timer.NewTimer(TOOLTIP_UPDATE_TIME, function()
 					if (self.showingTooltip) then
@@ -63,11 +63,11 @@ function OnEnter(self)
 					end
 				end)
 			else
-				GameTooltipTextLeft2:SetText(("|cFFFF0000You have not collected this rune|r\n%s"):format(GameTooltipTextLeft2:GetText()))
+				GameTooltipTextLeft2:SetText(("|cFFFF0000No has conseguido esta runa|r\n%s"):format(GameTooltipTextLeft2:GetText()))
 				if (hasGuide) then
-					GameTooltipTextLeft3:SetText("|cFF00FF00<Click to view the the guide>|r")
+					GameTooltipTextLeft3:SetText("|cFF00FF00<Haz clic para ver la guía>|r")
 				else
-					GameTooltipTextLeft3:SetText("|cFF808080(Guide not yet available)|r")
+					GameTooltipTextLeft3:SetText("|cFF808080(Guía aún no disponible)|r")
 				end
 			end
 			GameTooltip:Show()
@@ -141,7 +141,7 @@ function RunesService.Init()
 				self:SetScript("OnClick", OnClick)
 				if (spoilerLevel == 0) then
 					self.icon:SetTexture(134400)
-					self.name:SetText("Mysterious Rune")
+					self.name:SetText("Runa misteriosa")
 				end
 				self:SetScript("OnEnter", OnEnter)
 			else

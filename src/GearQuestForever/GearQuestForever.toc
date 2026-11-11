@@ -2,6 +2,8 @@
 ## Title: GearQuest Forever
 ## Notes: Leveling gear upgrades for WoW Forever - click a slot, pick a hunt, track it in the log.
 ## Notes-frFR: Améliorations d'équipement pour monter de niveau sur WoW Forever : cliquez sur un emplacement, choisissez une traque, suivez-la dans le journal.
+## Notes-esES: Mejoras de equipo para subir de nivel en WoW Forever: haz clic en una ranura, elige una búsqueda y síguela en el registro.
+## Notes-esMX: Mejoras de equipo para subir de nivel en WoW Forever: haz clic en una ranura, elige una búsqueda y síguela en el registro.
 ## Author: Henrik8210
 ## Version: 1.1.3
 ## IconTexture: Interface\AddOns\GearQuestForever\Art\GearQuest-Icon

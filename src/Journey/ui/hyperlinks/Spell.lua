@@ -14,7 +14,7 @@ local function OnClick(frame, spellRef)
 end
 
 function Hyperlinks.GetSpellHyperlink(spellRef)
-    local name = spellRef.label or Names.GetName(GetSpellInfo, spellRef.spell)
+    local name = (spellRef.label and (L[spellRef.label] or spellRef.label)) or Names.GetName(GetSpellInfo, spellRef.spell)
     return string.format("|Hspell:%s:%s|h%s|h", spellRef.spell, Hyperlinks.CreateReference(spellRef), name)
 end
 

@@ -11,6 +11,18 @@ AlertSounds = {
     { name = "Raspberry", id = 2837 },
 }
 
+if (GetLocale() == "esES" or GetLocale() == "esMX") then
+    AlertSounds = {
+        { name = "Flauta", id = 7734 },
+        { name = "Sirena de niebla", id = 7197 },
+        { name = "Campanada 1", id = 6674 },
+        { name = "Campanada 2", id = 6595 },
+        { name = "Thaddius", id = 8873 },
+        { name = "Cuerno del despertar", id = 7034 },
+        { name = "Pedo", id = 2837 },
+    }
+end
+
 AlertSoundsLUT = { }
 
 for _, v in ipairs(AlertSounds) do

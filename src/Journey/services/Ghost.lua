@@ -5,7 +5,7 @@ select(2, ...).SetupGlobalFacade()
 
 local OnEvent
 local spiritHealerLocation = {
-    GetTooltipLabel = function() return "Spirit Healer" end,
+    GetTooltipLabel = function() return L["Spirit Healer"] end,
 
 }
 local updateSpiritHealerLocation

@@ -1,9 +1,13 @@
 ## Interface: 20506, 16001, 11509
 ## Title: What's Training?
+## Title-esES: ¿Qué puedo aprender? (What's Training?)
+## Title-esMX: ¿Qué puedo aprender? (What's Training?)
 ## Title-zhCN: 能学什么？
 ## Version: 11.4.3
 ## Author: Sveng
 ## Notes: Shows you what spells are available at your class trainer
+## Notes-esES: Muestra qué hechizos y facultades están disponibles en tu instructor de clase.
+## Notes-esMX: Muestra qué hechizos y facultades están disponibles en tu instructor de clase.
 ## Notes-ruRU: Показывает, какие заклинания доступны у вашего классового наставника.
 ## Notes-zhCN: 显示你的职业训练师处有哪些法术可以学习。
 ## SavedVariables: WT_SpellbookIcon, WT_Minimap, WT_WeaponGrouping, WT_ShowKnownWeaponSkills, WT_FloatingFramePoint, WT_WaypointProvider [AllowLoadGameType classic][ExcludeLoadGameType camelot]

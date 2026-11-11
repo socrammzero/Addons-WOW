@@ -124,6 +124,20 @@ NPCTypes = {
     [8] = "Critter",
 }
 
+if (GetLocale() == "esES" or GetLocale() == "esMX") then
+    NPCTypes = {
+        [0] = "Humanoide",
+        [1] = "No-muerto",
+        [2] = "Elemental",
+        [3] = "Bestia",
+        [4] = "Dragonante",
+        [5] = "Gigante",
+        [6] = "Demonio",
+        [7] = "Mecánico",
+        [8] = "Sabandija",
+    }
+end
+
 NPCClassifications = {
     [1] = ELITE, -- Elite
     [2] = ITEM_QUALITY3_DESC, -- Rare,

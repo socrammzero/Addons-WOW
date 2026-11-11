@@ -1,0 +1,15 @@
+## Interface: 16001
+## Title: Forever Loot Sparkles
+## Title-esES: Forever Loot Sparkles
+## Title-esMX: Forever Loot Sparkles
+## Notes: Always shows the sparkle effect on lootable quest items. Switches the loot sparkle back on at login and whenever a graphics change resets it. Options under Options > AddOns.
+## Notes-esES: Muestra siempre el efecto de destello en los objetos de misión que se pueden despojar. Vuelve a activar el destello de botín al iniciar sesión y cada vez que un cambio gráfico lo restablece. Opciones en Opciones > AddOns.
+## Notes-esMX: Muestra siempre el efecto de destello en los objetos de misión que se pueden despojar. Vuelve a activar el destello de botín al iniciar sesión y cada vez que un cambio gráfico lo restablece. Opciones en Opciones > AddOns.
+## Author: Ashtar Senior
+## Version: v2.0.0
+## IconTexture: Interface\AddOns\ForeverLootSparkles\Icon
+## SavedVariables: ForeverLootSparklesDB
+## X-License: GPL-3.0-or-later
+## X-Curse-Project-ID: 1729017
+
+ForeverLootSparkles.lua

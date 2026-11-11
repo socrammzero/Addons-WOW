@@ -58,7 +58,7 @@ function Names.GetQuestName(questID)
 end
 
 function Names.GetGameObjectName(id)
-	return GameObjectNames[id] or "UNSPECIFIED OBJECT"
+	return GameObjectNames[id] or ((GetLocale() == "esES" or GetLocale() == "esMX") and "OBJETO NO ESPECIFICADO" or "UNSPECIFIED OBJECT")
 end
 
 EventFrame:SetScript("OnUpdate", OnUpdate)

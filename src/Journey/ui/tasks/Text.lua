@@ -49,9 +49,9 @@ local function ColorName(idAttribute, color, lookupFunction, hyperlinkFunction)
 		local name
 		if (type(widget[idAttribute]) == "number") then
 			name = hyperlinkFunction and hyperlinkFunction(widget)
-					or widget.label or Names.GetName(lookupFunction, widget[idAttribute])
+					or (widget.label and (L[widget.label] or widget.label)) or Names.GetName(lookupFunction, widget[idAttribute])
 		else
-			name = widget[idAttribute]
+			name = L[widget[idAttribute]] or widget[idAttribute]
 		end
 		local c = color
 		if (type(c) == "function") then
@@ -66,7 +66,8 @@ local ColorSpellName = ColorName("spell", Color.SPELL, GetSpellInfo, Hyperlinks.
 
 local function ColorValue(color, valueAttribute)
 	return function(widget, output)
-		table.insert(output[#output], colorFormat:format(color, widget[valueAttribute]))
+		local val = widget[valueAttribute]
+		table.insert(output[#output], colorFormat:format(color, (val and L[val]) or val))
 	end
 end
 
@@ -75,7 +76,7 @@ local function NewParagraph(output, val)
 		output[#output + 1] = { }
 	end
 	if (val) then
-		table.insert(output[#output], val)
+		table.insert(output[#output], L[val] or val)
 	end
 end
 
@@ -97,7 +98,8 @@ widgetHandlers = {
 	end},
 	illustration = {
 		renderFunc = function(widget, output, default)
-			table.insert(output[#output], string.format("|cFF00FF00|Himage:%s|h[%s]|h|r", widget.illustration, widget.label))
+			local lbl = (widget.label and L[widget.label]) or widget.label
+			table.insert(output[#output], string.format("|cFF00FF00|Himage:%s|h[%s]|h|r", widget.illustration, lbl))
 		end
 	},
 	italic = { renderFunc = function(widget, output)
@@ -129,7 +131,7 @@ widgetHandlers = {
 		renderFunc = function(widget, output, default)
 			local location = LocationsService.GetLocationByIdx(widget.location)
 			if (CheckCondition(location)) then
-				local template = widget.template or location:IsActive() and "Active" or "%s"
+				local template = (widget.template and L[widget.template]) or location:IsActive() and (L["Active"] or "Activo") or "%s"
 				table.insert(output[#output], string.format(
 						"|c%s|Hlocation:%s|h[%s]|h|r",
 						Color.LOCATION,
@@ -142,7 +144,7 @@ widgetHandlers = {
 	newline = {
 		renderFunc = function(widget, output)
 			table.insert(output[#output], "\n")
-			table.insert(output[#output], widget.newline)
+			table.insert(output[#output], (widget.newline and L[widget.newline]) or widget.newline)
 		end
 	},
 	npc = {

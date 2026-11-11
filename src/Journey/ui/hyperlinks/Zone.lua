@@ -11,7 +11,7 @@ end
 
 function Hyperlinks.GetZoneHyperlink(zoneRef)
     if (zoneRef.label) then
-        return string.format("|Hzone:%s:%s|h%s|h", zoneRef.zone, Hyperlinks.CreateReference(zoneRef), zoneRef.label)
+        return string.format("|Hzone:%s:%s|h%s|h", zoneRef.zone, Hyperlinks.CreateReference(zoneRef), L[zoneRef.label] or zoneRef.label)
     else
         return Names.GetName(GetMapName, zoneRef.zone)
     end

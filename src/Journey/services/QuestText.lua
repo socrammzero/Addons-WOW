@@ -5,8 +5,8 @@ select(2, ...).SetupGlobalFacade()
 
 QuestTextService = { }
 
-local startworkTemplate = { "On the way, ", "kill ", "kill and loot ", "click on ", "use ", "speak to ", "go to the waypoint", "wait for a bit", "go to " }
-local completeTemplate = { "", "Kill ", "Kill and loot ", "Click on ", "Use ", "Speak to ", "Go to the waypoint", "Wait for a bit", "Go to " }
+local startworkTemplate = { "De camino, ", "mata a ", "mata y despoja a ", "haz clic en ", "usa ", "habla con ", "ve al punto de ruta", "espera un momento", "ve a " }
+local completeTemplate = { "", "Mata a ", "Mata y despoja a ", "Haz clic en ", "Usa ", "Habla con ", "Ve al punto de ruta", "Espera un momento", "Ve a " }
 
 function QuestTextService.TryCreateTextTask(task, guide, stepID)
 	if (not guide.quests) then return end
@@ -62,12 +62,12 @@ function QuestTextService.TryCreateTextTask(task, guide, stepID)
 					if (objective.gameobject) then
 						table.insert(textTask, template[4])
 						table.insert(textTask, { gameobject = objective.gameobject })
-						table.insert(textTask, " and ")
+						table.insert(textTask, " y ")
 						table.insert(textTask, startworkTemplate[objective.loot and 3 or 2])
 					elseif (objective.clicknpc) then
 						table.insert(textTask, template[4])
 						table.insert(textTask, { npc = objective.clicknpc })
-						table.insert(textTask, " and ")
+						table.insert(textTask, " y ")
 						table.insert(textTask, startworkTemplate[objective.loot and 3 or 2])
 					else
 						table.insert(textTask, template[objective.loot and 3 or 2])
@@ -82,7 +82,7 @@ function QuestTextService.TryCreateTextTask(task, guide, stepID)
 					table.insert(textTask, template[5])
 					table.insert(textTask, { item = objective.use } )
 					if (objective.npc or objective.gameobject) then
-						table.insert(textTask, " on ")
+						table.insert(textTask, " en ")
 					end
 				elseif (objective.goto) then
 					if (objective.gameobject) then
@@ -105,24 +105,24 @@ function QuestTextService.TryCreateTextTask(task, guide, stepID)
 						table.insert(textTask, { npc = npctargets[1] })
 					elseif (#npctargets == 2) then
 						table.insert(textTask, { npc = npctargets[1] })
-						table.insert(textTask, " and ")
+						table.insert(textTask, " y ")
 						table.insert(textTask, { npc = npctargets[2] })
 					elseif (#npctargets == 3) then
 						table.insert(textTask, { npc = npctargets[1] })
 						table.insert(textTask, ", ")
 						table.insert(textTask, { npc = npctargets[2] })
-						table.insert(textTask, " and ")
+						table.insert(textTask, " y ")
 						table.insert(textTask, { npc = npctargets[3] })
 					elseif (#npctargets > 3) then
-						table.insert(textTask, "NPCs")
+						table.insert(textTask, "PNJ")
 					end
 				end
 				if ((objective.clickgameobject or (objective.gameobject and not objective.goto) or (objective.fromkill and (objective.clicknpc or objective.use))) and not objective.kill) then
 					if (objective.fromkill) then
 						if (objective.clicknpc) then
-							table.insert(textTask, ", and then click on ")
+							table.insert(textTask, ", y luego haz clic en ")
 						else
-							table.insert(textTask, ", and then use ")
+							table.insert(textTask, ", y luego usa ")
 						end
 					end
 					if (objective.clicknpc) then
@@ -138,12 +138,12 @@ function QuestTextService.TryCreateTextTask(task, guide, stepID)
 					end
 				end
 				if (objective.around) then
-					table.insert(textTask, " around the area")
+					table.insert(textTask, " por la zona")
 				end
 				if (objective.useoncorpse) then
-					table.insert(textTask, ", and then use ")
+					table.insert(textTask, ", y luego usa ")
 					table.insert(textTask, { item = objective.useoncorpse} )
-					table.insert(textTask, " on its corpse")
+					table.insert(textTask, " en su cadáver")
 				end
 				table.insert(textTask, ".")
 				if (objective.extra) then

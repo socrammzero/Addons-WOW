@@ -12,7 +12,7 @@ function TaskType:RenderFunc(task, container)
 	container.text:SetShown(true)
 	local hint = ""
 	if (task.hint and type(task.hint) == "string") then
-		hint = " (" .. task.hint .. ")"
+		hint = " (" .. (L[task.hint] or task.hint) .. ")"
 	end
 	if (task.click) then
 		container.text:SetText(L["Click on %s%s."]:format(link, hint))

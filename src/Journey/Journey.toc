@@ -6,6 +6,8 @@
 ## Version: 4.00.06
 ## X-Min-Guide-Version: 4.00.00
 ## Notes: Version: 4.00.06
+## Notes-esES: Versión: 4.00.06
+## Notes-esMX: Versión: 4.00.06
 ## DefaultState: enabled
 ## SavedVariables: Journey_Account
 ## SavedVariablesPerCharacter: Journey_Character

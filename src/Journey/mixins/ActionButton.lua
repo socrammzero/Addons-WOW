@@ -26,7 +26,7 @@ popupDialog = {
     showAlert = true,
     preferredIndex = 3,
     run = function(itemID, itemName)
-        popupDialog.text = "Are you sure you want to destroy " .. (itemName or "the item") .. "?"
+        popupDialog.text = "¿Seguro que quieres destruir " .. (itemName or "el objeto") .. "?"
         popupDialog.itemID = itemID
         StaticPopup_Show(addonName .. "_CONFIRM_DESTROY_ITEM")
     end
@@ -110,30 +110,30 @@ function OnEnter(self)
             if (availNow == 0) then
                 GuideTooltip:AddLine(" ")
                 if (availTotal ~= 0) then
-                    GuideTooltip:AddLine("|CFFFF0000Item is in your bank|r")
+                    GuideTooltip:AddLine("|CFFFF0000El objeto está en tu banco|r")
                 else
-                    GuideTooltip:AddLine("|CFFFF0000You do not have this item|r")
+                    GuideTooltip:AddLine("|CFFFF0000No tienes este objeto|r")
                 end
             end
             local type = self.parent.type
             if (availNow > 0 and type == TYPE_ITEM) then
                 GuideTooltip:AddLine(" ")
-                GuideTooltip:AddLine("|CFFFFFF00Shift-click to drag onto the action bar|r")
+                GuideTooltip:AddLine("|CFFFFFF00Mayús-clic para arrastrar a la barra de acción|r")
             end
             if (availTotal ~= 0 and type == TYPE_DESTROY) then
                 GuideTooltip:AddLine(" ")
-                GuideTooltip:AddLine("|CFFFF0000Click to destroy the item|r")
+                GuideTooltip:AddLine("|CFFFF0000Haz clic para destruir el objeto|r")
             end
             if (not KeybindService.HasBindings()) then
                 GuideTooltip:AddLine(" ")
-                GuideTooltip:AddLine("no keybinds set", 0.6, 0.6, 0.6)
+                GuideTooltip:AddLine("sin atajos asignados", 0.6, 0.6, 0.6)
             end
         end
     elseif (self.parent.type == TYPE_TARGET) then
         GuideTooltip:SetNPCs(self.parent.npcIDs)
         if (not KeybindService.HasBindings()) then
             GuideTooltip:AddLine(" ")
-            GuideTooltip:AddLine("no keybinds set", 0.6, 0.6, 0.6)
+            GuideTooltip:AddLine("sin atajos asignados", 0.6, 0.6, 0.6)
         end
     elseif (self.parent.type == TYPE_SPELL) then
         if (not GuideTooltip.refreshOnly) then

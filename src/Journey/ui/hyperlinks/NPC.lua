@@ -18,7 +18,7 @@ function Hyperlinks.GetNPCHyperlink(npcRef, useTitle)
     local npcName = Names.GetName(GetCreatureName, npcID)
     local label
     if (npcRef.label) then
-        label = npcRef.label
+        label = L[npcRef.label] or npcRef.label
     elseif (useTitle) then
         local npcInfo = GetCreatureInfo(npcID)
         label = npcInfo and npcInfo.title or "..."

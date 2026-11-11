@@ -154,9 +154,9 @@ local function onVerifyFailed(source)
     slotLookup = { }
     catalogDecryptKey = nil
     if (source == "External") then
-        print("|cFFFF4444[" .. addonTitle .. "]|r Guide data integrity check failed. Please re-download your guide content.")
+        print("|cFFFF4444[" .. addonTitle .. "]|r Falló la comprobación de integridad de los datos de la guía. Por favor, vuelve a descargar el contenido de las guías.")
     else
-        print("|cFFFF4444[" .. addonTitle .. "]|r Addon data integrity check failed. Please reinstall the addon.")
+        print("|cFFFF4444[" .. addonTitle .. "]|r Falló la comprobación de integridad de los datos del addon. Por favor, reinstala el addon.")
     end
     if (GuideNavigationService and GuideNavigationService.SetGuide) then
         GuideNavigationService.SetGuide(nil)
@@ -331,7 +331,7 @@ function CatalogService.HandleStubGuide(guideID)
     local name = Brand.installerName
 
     if (previousBattleTag) then
-        showSetupPopup("ADDITIONAL SETUP REQUIRED", "Please re-run the " .. name .. " to\nfinish setting up your guides.")
+        showSetupPopup("CONFIGURACIÓN ADICIONAL NECESARIA", "Por favor, vuelve a ejecutar " .. name .. " para\nterminar de configurar tus guías.")
         return true
     end
 
@@ -339,11 +339,11 @@ function CatalogService.HandleStubGuide(guideID)
     if (liveTag) then
         SavedVariables.battleTag = liveTag
         SavedVariables.needsInstallerRun = true
-        showSetupPopup("ADDITIONAL SETUP REQUIRED", "Click Reload, and when prompted,\nre-run the " .. name .. ".", true)
+        showSetupPopup("CONFIGURACIÓN ADICIONAL NECESARIA", "Haz clic en Recargar y, cuando se te solicite,\nvuelve a ejecutar " .. name .. ".", true)
         return true
     end
 
-    showSetupPopup("SETUP PENDING", "You can complete your guide installation\nwhen Battle.net comes back online.")
+    showSetupPopup("CONFIGURACIÓN PENDIENTE", "Podrás completar la instalación de tus guías\ncuando Battle.net vuelva a estar en línea.")
     return true
 end
 
@@ -351,5 +351,5 @@ function CatalogService.CheckStartupPrompt()
     if (not needsInstallerRun) then return end
     needsInstallerRun = nil
     SavedVariables.needsInstallerRun = nil
-    showSetupPopup("ADDITIONAL SETUP REQUIRED", "Please re-run the " .. Brand.installerName .. " to\nfinish setting up your guides.", false, "I'm done!")
+    showSetupPopup("CONFIGURACIÓN ADICIONAL NECESARIA", "Por favor, vuelve a ejecutar " .. Brand.installerName .. " para\nterminar de configurar tus guías.", false, "¡Listo!")
 end

@@ -5,8 +5,8 @@ select(2, ...).SetupGlobalFacade()
 
 local component = UI.CreateComponent("DefaultTaskGroupContainer")
 
-local OOPS_MSG = "Oops! It seems that something should be displayed here.\n\n" ..
-	"Please report the issue support and be sure to provide the following info:\n\n%s"
+local OOPS_MSG = "¡Vaya! Parece que debería mostrarse algo aquí.\n\n" ..
+	"Por favor, informa del problema al soporte y asegúrate de proporcionar la siguiente información:\n\n%s"
 
 local guideFrame
 local headerFrame

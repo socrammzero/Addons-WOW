@@ -54,7 +54,7 @@ function GuideService.GetGuide(guideID)
         local guideTemplate = CatalogService.GetGuideTemplate(guideID)
         if (not guideTemplate) then return end
         if (CatalogService.IsExpired(guideID)) then
-            print("|cFFFF4444[" .. addonTitle .. "]|r This guide has expired. Run the " .. addonTitle .. " Manager to refresh your guides.")
+            print("|cFFFF4444[" .. addonTitle .. "]|r Esta guía ha caducado. Ejecuta el gestor de " .. addonTitle .. " para actualizar tus guías.")
             return nil
         end
         local decryptKey = CatalogService.GetDecryptKey(guideID)
@@ -74,7 +74,7 @@ function GuideService.GetGuide(guideID)
             if (failReason == "hash_mismatch") then
                 local slot = CatalogService.GetSlotInfo(guideID)
                 if (slot and slot.prefix == "External") then
-                    print("|cFFFF4444[" .. addonTitle .. "]|r Guide data integrity check failed. Please re-download your guide content.")
+                    print("|cFFFF4444[" .. addonTitle .. "]|r Falló la comprobación de integridad de los datos de la guía. Por favor, vuelve a descargar el contenido de las guías.")
                 end
             end
             return nil

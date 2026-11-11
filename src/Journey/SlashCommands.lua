@@ -65,17 +65,17 @@ local handlers = {
 }
 
 local function displayHelp()
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("Show the guide interface: %s show", slashCommand))
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("Hide the guide interface: %s hide", slashCommand))
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("Enable the minimap button: %s enable", slashCommand))
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("Disable the minimap button: %s disable", slashCommand))
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("Next step: %s next", slashCommand))
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("Previous step: %s back", slashCommand))
+	DEFAULT_CHAT_FRAME:AddMessage(string.format("Mostrar la interfaz de la guía: %s show", slashCommand))
+	DEFAULT_CHAT_FRAME:AddMessage(string.format("Ocultar la interfaz de la guía: %s hide", slashCommand))
+	DEFAULT_CHAT_FRAME:AddMessage(string.format("Activar el botón del minimapa: %s enable", slashCommand))
+	DEFAULT_CHAT_FRAME:AddMessage(string.format("Desactivar el botón del minimapa: %s disable", slashCommand))
+	DEFAULT_CHAT_FRAME:AddMessage(string.format("Paso siguiente: %s next", slashCommand))
+	DEFAULT_CHAT_FRAME:AddMessage(string.format("Paso anterior: %s back", slashCommand))
 	if (Brand.hasWebGuides) then
 	else
-		DEFAULT_CHAT_FRAME:AddMessage(string.format("Go to step in current guide: %s goto ##-##", slashCommand))
+		DEFAULT_CHAT_FRAME:AddMessage(string.format("Ir a un paso en la guía actual: %s goto ##-##", slashCommand))
 	end
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("Set a waypoint: %s way <x> <y>", slashCommand))
+	DEFAULT_CHAT_FRAME:AddMessage(string.format("Establecer un punto de ruta: %s way <x> <y>", slashCommand))
 end
 
 local function handleSlashCommand(msg)

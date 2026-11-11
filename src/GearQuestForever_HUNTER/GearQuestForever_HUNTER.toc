@@ -1,0 +1,17 @@
+## Interface: 16001
+## Title: GearQuest Forever: Hunter
+## Title-esES: GearQuest Forever: Cazador
+## Title-esMX: GearQuest Forever: Cazador
+## Notes: Hunt lists for this class. GearQuest Forever loads this when you play or simulate it.
+## Notes-esES: Listas de equipo para esta clase. GearQuest Forever lo carga automáticamente cuando juegas o simulas con ella.
+## Notes-esMX: Listas de equipo para esta clase. GearQuest Forever lo carga automáticamente cuando juegas o simulas con ella.
+## Author: Henrik8210
+## Version: 1.1.3
+## IconTexture: Interface\Icons\ClassIcon_Hunter
+## LoadOnDemand: 1
+## Dependencies: GearQuestForever
+## RequiredDeps: GearQuestForever
+
+Data.Hunter.generated.lua
+Data.Hunter.Early.1to9.generated.lua
+AuditTips.lua
