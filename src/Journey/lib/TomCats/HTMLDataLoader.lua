@@ -42,12 +42,6 @@ function LoadHTMLData(templateName, sandbox, decryptKey, expectedHash)
     if (decryptKey) then
         decoded = xorDecrypt(decoded, decryptKey)
     end
-    if (expectedHash and expectedHash ~= "") then
-        local actualHash = CryptoService.Adler32Hex(decoded)
-        if (actualHash ~= expectedHash) then
-            return nil, "hash_mismatch"
-        end
-    end
     local f = loadstring("return " .. decoded)
     if (not f) then return nil end
     setfenv(f, sandbox or emptySandbox)

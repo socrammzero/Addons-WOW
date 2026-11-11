@@ -264,6 +264,8 @@ function CatalogService.IsExpired(guideID)
 end
 
 function CatalogService.GetContentHash(guideID)
+    local slot = slotLookup and slotLookup[guideID]
+    if (slot and slot.prefix == "Bundled") then return nil end
     local info = guideInfoByID and guideInfoByID[guideID]
     if (not info) then return nil end
     return info.contentHash
