@@ -7,15 +7,16 @@
 ## Notes: Brings back the sparkles on herbs, ore veins, quest objects and corpses with loot that Forever Loot Sparkles 2.0 removed, safe for self-cast, with a color per category. Can hide interaction icons, and translates Forever Loot Sparkles into German and French.
 ## Notes-deDE: Bringt das Funkeln an Kräutern, Erzvorkommen, Questobjekten und Leichen mit Beute zurück, das Forever Loot Sparkles 2.0 entfernt hat, sicher fürs Selbstzaubern und mit einer Farbe je Kategorie. Kann Interaktionssymbole ausblenden und übersetzt Forever Loot Sparkles ins Deutsche und Französische.
 ## Notes-frFR: Rétablit les éclats sur les herbes, filons, objets de quête et cadavres avec butin retirés par Forever Loot Sparkles 2.0, sans gêner l'auto-incantation, avec une couleur par catégorie. Peut masquer les icônes d'interaction et traduit Forever Loot Sparkles en allemand et en français.
-## Notes-esES: Recupera los destellos en hierbas, filones de mineral, objetos de misión y cadáveres con botín que Forever Loot Sparkles 2.0 eliminó, seguro para el autolanzamiento y con un color por categoría. Permite ocultar los iconos de interacción y traduce Forever Loot Sparkles al español.
-## Notes-esMX: Recupera los destellos en hierbas, filones de mineral, objetos de misión y cadáveres con botín que Forever Loot Sparkles 2.0 eliminó, seguro para el autolanzamiento y con un color por categoría. Permite ocultar los iconos de interacción y traduce Forever Loot Sparkles al español.
+## Notes-esES: Recupera los destellos en hierbas, vetas de mineral, objetos de misión y cadáveres con botín que Forever Loot Sparkles 2.0 eliminó, seguro para el autolanzamiento y con un color por categoría. Permite ocultar los iconos de interacción y traduce Forever Loot Sparkles al español.
+## Notes-esMX: Recupera los destellos en hierbas, vetas de mineral, objetos de misión y cadáveres con botín que Forever Loot Sparkles 2.0 eliminó, seguro para el autolanzamiento y con un color por categoría. Permite ocultar los iconos de interacción y traduce Forever Loot Sparkles al español.
 ## Author: Sven
-## Version: 2.0.0
+## Version: 2.1.0
 ## Dependencies: ForeverLootSparkles
 ## SavedVariables: ForeverLootSparklesColoringDB
 ## IconTexture: Interface\AddOns\ForeverLootSparkles\Icon
 ## X-License: GPL-3.0-or-later
 
+LocalesMore.lua
 Locales.lua
 Coloring.lua
 IconHider.lua

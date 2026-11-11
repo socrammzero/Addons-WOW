@@ -17,8 +17,8 @@ console.log('GearQuestForever in game has esES:', gq.includes('GQ.ActiveLocale ~
 const fls = fs.readFileSync('D:/World of Warcraft/_forever_/Interface/AddOns/ForeverLootSparkles/ForeverLootSparkles.lua', 'utf8');
 console.log('ForeverLootSparkles in game has esES:', fls.includes('locale == "esES"'));
 
-const flsc = fs.readFileSync('D:/World of Warcraft/_forever_/Interface/AddOns/ForeverLootSparkles_Coloring/Locales.lua', 'utf8');
-console.log('ForeverLootSparkles_Coloring in game has esES:', flsc.includes('locale == "esES"'));
+const flsc = fs.readFileSync('D:/World of Warcraft/_forever_/Interface/AddOns/ForeverLootSparkles_Coloring/LocalesMore.lua', 'utf8');
+console.log('ForeverLootSparkles_Coloring in game has esES:', flsc.includes('L.esES = {') && flsc.includes('FLS.esES = Sparkles('));
 
 const auc = fs.readFileSync('D:/World of Warcraft/_forever_/Interface/AddOns/Auctionator/Locales/esES.lua', 'utf8');
 console.log('Auctionator in game has SUPPORT_HEADER:', auc.includes('L["SUPPORT_HEADER"]'));

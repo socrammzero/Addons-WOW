@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.1.0
+
+- New languages: Spanish (esES, esMX), Brazilian Portuguese (ptBR), Italian (itIT), Russian (ruRU), Korean (koKR) and Chinese (zhCN, zhTW), on top of English, German and French. The language follows your game client automatically.
+
+## 2.0.3
+
+- The color swatches now use the same frame and size as the checkboxes next to them.
+
+## 2.0.2
+
+- `/flscolor` opens the options again, on the Forever Loot Sparkles page, without the blocked function. If the game refuses, it tells you in chat where to find them.
+
+## 2.0.1
+
+- Fixed: `/flscolor` raised "ADDON_ACTION_BLOCKED ... OpenSettingsPanel()". The game no longer lets addons open the options window, so `/flscolor` now tells you in chat where to find the options.
+
 ## 2.0.0
 
 - New name: "Forever Loot Sparkles - Herbs & Ores". The folder stays ForeverLootSparkles_Coloring, so your settings are kept; just replace the folder.

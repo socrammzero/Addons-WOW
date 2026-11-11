@@ -7,7 +7,7 @@ Companion addon for Forever Loot Sparkles. The original addon is not modified.
   pauses in combat and on living units) and an option to hide the nameplate under the sparkle.
 
 - Colors the glints per category: Herbs, Ore veins, Quest objects, Corpses with loot.
-  The color swatches sit next to the checkboxes on the Forever Loot Sparkles options page, with an on/off switch and a reset button below them (`/flscolor` opens the page).
+  The color swatches sit next to the checkboxes on the Forever Loot Sparkles options page, with an on/off switch and a reset button below them.
   Saved per account in `ForeverLootSparklesColoringDB`.
 - Translates Forever Loot Sparkles' options panel into German (deDE) and French (frFR),
   chosen automatically from the client language.

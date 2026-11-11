@@ -3,7 +3,7 @@
 -- Quest objects, Corpses with loot) and, below them, a "Colors" section with
 -- an on/off checkbox and a reset button. If that page or the needed Settings
 -- API can't be found, a separate page is used instead.
--- Slash command: /flscolor
+-- Slash command: /flscolor (prints where the options are; /flscolor icons for debugging)
 
 local ADDON_NAME, ns = ...;
 local L = ns.L;
@@ -82,10 +82,12 @@ local function NewSwatch(parent)
 	color:SetPoint("TOPLEFT", 3, -3);
 	color:SetPoint("BOTTOMRIGHT", -3, 3);
 	swatch.color = color;
+	swatch.border, swatch.inner = border, inner;
 
 	local highlight = swatch:CreateTexture(nil, "HIGHLIGHT");
 	highlight:SetAllPoints();
 	highlight:SetColorTexture(1, 1, 1, 0.25);
+	swatch.highlight = highlight;
 
 	swatch:SetScript("OnClick", function(self)
 		if self.key then
@@ -312,6 +314,53 @@ local function RowVariable(frame, elementData)
 end
 
 -- Rows are recycled across all option pages: show the swatch only on ours
+-- Gives a texture the same art as another (atlas or file with its coordinates)
+local function CopyLook(target, source)
+	if type(source) ~= "table" then
+		return false;
+	end
+	local okAtlas, atlas = pcall(source.GetAtlas, source);
+	if okAtlas and type(atlas) == "string" and atlas ~= "" then
+		target:SetAtlas(atlas);
+		return true;
+	end
+	local okFile, file = pcall(source.GetTexture, source);
+	if okFile and file then
+		target:SetTexture(file);
+		pcall(function() target:SetTexCoord(source:GetTexCoord()); end);
+		return true;
+	end
+	return false;
+end
+
+-- Same size and frame as the checkbox next to it; the color fills the inside
+local function StyleLikeCheckbox(swatch, checkbox)
+	if swatch.styled or not checkbox then
+		return;
+	end
+	swatch.styled = true;
+	local width, height = checkbox:GetSize();
+	if not (width and width > 0) then
+		return;
+	end
+	swatch:SetSize(width, height);
+	local normal = checkbox.GetNormalTexture and checkbox:GetNormalTexture();
+	if not CopyLook(swatch.border, normal) then
+		return;
+	end
+	swatch.border:SetVertexColor(1, 1, 1, 1);
+	swatch.inner:Hide();
+	local inset = math.floor(width * 0.22 + 0.5);
+	swatch.color:ClearAllPoints();
+	swatch.color:SetPoint("TOPLEFT", inset, -inset);
+	swatch.color:SetPoint("BOTTOMRIGHT", -inset, inset);
+	local highlight = checkbox.GetHighlightTexture and checkbox:GetHighlightTexture();
+	if CopyLook(swatch.highlight, highlight) then
+		swatch.highlight:SetVertexColor(1, 1, 1, 1);
+		swatch.highlight:SetBlendMode("ADD");
+	end
+end
+
 local function DecorateRow(frame, elementData)
 	local key = SWATCH_FOR_VARIABLE[RowVariable(frame, elementData) or ""];
 	local swatch = frame.FLSColoringSwatch;
@@ -328,6 +377,7 @@ local function DecorateRow(frame, elementData)
 	swatch:ClearAllPoints();
 	local checkbox = frame.Checkbox or frame.CheckBox;
 	if checkbox then
+		StyleLikeCheckbox(swatch, checkbox);
 		swatch:SetPoint("LEFT", checkbox, "RIGHT", 14, 0);
 	else
 		swatch:SetPoint("RIGHT", frame, "RIGHT", -20, 0);
@@ -468,10 +518,20 @@ SlashCmdList.FLSCOLOR = function(message)
 		ns.DebugIcons();
 		return;
 	end
-	if settingsCategory and Settings.OpenToCategory then
-		local id = settingsCategory.GetID and settingsCategory:GetID() or settingsCategory.ID;
-		Settings.OpenToCategory(id);
+	-- Settings.OpenToCategory is blocked for addons in this client
+	-- (ADDON_ACTION_BLOCKED on OpenSettingsPanel). Showing the panel
+	-- directly and picking the page avoids that function; if the panel
+	-- doesn't open, only say where the options are.
+	if not InCombatLockdown() and SettingsPanel and settingsCategory then
+		pcall(ShowUIPanel, SettingsPanel);
+		if SettingsPanel:IsShown() then
+			if SettingsPanel.SelectCategory then
+				pcall(SettingsPanel.SelectCategory, SettingsPanel, settingsCategory);
+			end
+			return;
+		end
 	end
+	print("|cffffd200Forever Loot Sparkles - Herbs & Ores:|r " .. L.OPEN_HINT);
 end
 
 -- Forever Loot Sparkles 2.x dropped the herb/ore/corpse/quest sparkles;
