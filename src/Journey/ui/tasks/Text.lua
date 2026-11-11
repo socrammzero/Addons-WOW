@@ -83,10 +83,14 @@ widgetHandlers = {
 	area = {
 		renderFunc = ColorName("area", Color.AREA, nil, Hyperlinks.GetAreaHyperlink)
 	},
-	bold = { renderFunc = ColorValue(Color.BOLD, "bold") },
+	bold = { renderFunc = function(widget, output)
+		local val = L[widget.bold] or widget.bold
+		table.insert(output[#output], colorFormat:format(Color.BOLD, val))
+	end },
 	gameobject = { renderFunc = ColorName("gameobject", Color.GAME_OBJECT, nil, Hyperlinks.GetGameObjectHyperlink) },
 	getout = { renderFunc = function(widget, output, default)
-		NewParagraph(output, colorFormat:format(Color.GET_OUT, widget.getout))
+		local val = L[widget.getout] or widget.getout
+		NewParagraph(output, colorFormat:format(Color.GET_OUT, val))
 	end},
 	icon = { renderFunc = function(widget, output, default)
 		table.insert(output[#output], IconService.GetIconText(widget.icon, 10, widget.scale, widget.offsetx, widget.offsety)) --todo: Dynamically scale this with the text resize feature
@@ -96,7 +100,10 @@ widgetHandlers = {
 			table.insert(output[#output], string.format("|cFF00FF00|Himage:%s|h[%s]|h|r", widget.illustration, widget.label))
 		end
 	},
-	italic = { renderFunc = ColorValue(Color.ITALIC, "italic") },
+	italic = { renderFunc = function(widget, output)
+		local val = L[widget.italic] or widget.italic
+		table.insert(output[#output], colorFormat:format(Color.ITALIC, val))
+	end },
 	item = { renderFunc = function(widget, output, default)
 		if (widget.showicon ~= false) then
 			local _, _, _, _, icon = GetItemInfoInstant(widget.item)
@@ -161,7 +168,10 @@ widgetHandlers = {
 			end
 		end
 	},
-	red = { renderFunc = ColorValue(Color.RED_TEXT, "red") },
+	red = { renderFunc = function(widget, output)
+		local val = L[widget.red] or (widget.red == "NOTE:" and "NOTA:") or widget.red
+		table.insert(output[#output], colorFormat:format(Color.RED_TEXT, val))
+	end },
 	search = { renderFunc = ColorValue(Color.SEARCH_TERM, "label") },
 	skill = { renderFunc = ColorValue(Color.SKILL, "label") },
 	skipped = {
@@ -199,7 +209,8 @@ widgetHandlers = {
 	},
 	tip = {
 		renderFunc = function(widget, output)
-			NewParagraph(output, colorFormat:format(Color.TIP, widget.tip))
+			local val = L[widget.tip] or (widget.tip == "NOTE:" and "NOTA:") or widget.tip
+			NewParagraph(output, colorFormat:format(Color.TIP, val))
 		end
 	},
 	underscore = { renderFunc = ColorValue(Color.UNDERSCORE, "underscore") },
