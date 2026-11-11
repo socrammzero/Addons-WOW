@@ -30,9 +30,16 @@
       "method": "A (Inyección de tabla esES)"
     },
     {
+      "name": "GearQuest Forever Languages",
+      "folderName": "GearQuestForever_Languages",
+      "sync": true,
+      "priority": "Baja",
+      "method": "A (Tablas de idioma de GearQuest)"
+    },
+    {
       "name": "MoveAny",
       "folderName": "MoveAny",
-      "sync": false,
+      "sync": true,
       "priority": "Opcional",
       "method": "A (Opcional)"
     }
