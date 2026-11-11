@@ -108,9 +108,9 @@ for _, v in ipairs(maps) do
 						self.location.worldY
 				)
 			end
-			GameTooltip:AddLine(math.floor(totalDistance + 0.5) .. " yards away")
+			GameTooltip:AddLine(math.floor(totalDistance + 0.5) .. " " .. (L["m away"] or "m de distancia"))
 		else
-			GameTooltip:AddLine("Unknown distance")
+			GameTooltip:AddLine(L["Unknown distance"] or "Distancia desconocida")
 		end
 		if (Debug.IsMapPinDebuggingEnabled("HIDDEN")) then
 			GameTooltip:AddLine(string.format("Location #%s (debug)", self.location.idx))

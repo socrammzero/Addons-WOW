@@ -74,11 +74,81 @@ const aData = JSON.parse(fs.readFileSync('tools/resources/alliance.json'));
 const hData = JSON.parse(fs.readFileSync('tools/resources/horde.json'));
 const list = JSON.parse(fs.readFileSync('tools/guide_entries_summary.json'));
 
-const missingGuides = list.filter(e => !e.slot);
+const missingGuides = list.filter(e => parseInt(e.slot) >= 22);
 const missingA = missingGuides.filter(e => e.faction === 'Alliance');
 const missingH = missingGuides.filter(e => e.faction === 'Horde');
 
 console.log(`Missing Alliance: ${missingA.length}, Missing Horde: ${missingH.length}`);
+
+const TRAVEL_MAP = {
+    'deeprun tram': 'el Tranvía Subterráneo',
+    'ironforge station': 'la estación de Forjaz',
+    'ironforge': 'Forjaz',
+    'stormwind': 'Ventormenta',
+    'stormwind city': 'Ciudad de Ventormenta',
+    'darnassus': 'Darnassus',
+    'menethil harbor': 'el Puerto de Menethil',
+    'auberdine': 'Auberdine',
+    'theramore': 'Theramore',
+    'ratchet': 'Trinquete',
+    'booty bay': 'Bahía del Botín',
+    'orgrimmar': 'Orgrimmar',
+    'thunder bluff': 'Cima del Trueno',
+    'undercity': 'Entrañas',
+    "grom'gol": "Grom'gol",
+    'stonard': 'Rocal',
+    'kargath': 'Kargath',
+    'brackenwall': 'Murohelecho',
+    'shadowprey': 'Presa de las Sombras',
+    'camp mojache': 'Campamento Mojache',
+    'sun rock retreat': 'Refugio Roca del Sol',
+    'crossroads': 'El Cruce',
+    'gadgetzan': 'Gadgetzan',
+    'everlook': 'Vista Eterna',
+    'cenarion hold': 'Fuerte Cenarion',
+    'southshore': 'Costasur',
+    'tarren mill': 'Molino Tarren',
+    'refuge pointe': 'Refugio de la Algaba',
+    'hammerfall': 'Sentencia',
+    'aerie peak': 'Pico Nidal',
+    'nethergarde keep': 'Castillo de Nethergarde',
+    "morgan's vigil": "la Vigilia de Morgan",
+    'flame crest': 'Cresta de Llamas',
+    "light's hope chapel": "la Capilla de la Esperanza de la Luz",
+    'chillwind camp': 'Campamento del Orvallo',
+    'talonbranch glade': 'Claro Ramaespolón',
+    'bloodvenom post': 'Puesto Sangraveneno',
+    "rut'theran village": "la Aldea Rut'theran",
+    'feathermoon': 'Bastión Plumaluna',
+    'thalanaar': 'Thalanaar',
+    "nijel's point": "Cima de Nijel",
+    'astranaar': 'Astranaar',
+    'splintertree post': 'Puesto del Hacha Quemada',
+    "zoram'gar outpost": "Avanzada Zoram'gar",
+    'freewind post': 'Poblado Viento Libre',
+    'lakeshire': 'Villa del Lago',
+    'darkshire': 'Villa Oscura',
+    'sentinel hill': 'Colina del Centinela',
+    'thelsamar': 'Thelsamar'
+};
+
+function translateTravel(text) {
+    if (!text) return text;
+    let t = text.trim();
+    const m = t.match(/^to\s+(.+)$/i);
+    if (m) {
+        const dest = m[1].toLowerCase().trim().replace(/[><]/g, '');
+        if (TRAVEL_MAP[dest]) {
+            return `Hacia ${TRAVEL_MAP[dest]}`;
+        }
+        return `Hacia ${m[1]}`;
+    }
+    const clean = t.toLowerCase().replace(/[><]/g, '').trim();
+    if (TRAVEL_MAP[clean]) {
+        return `Hacia ${TRAVEL_MAP[clean]}`;
+    }
+    return t;
+}
 
 // Flatten raw steps with metadata
 function flattenDataset(data) {
@@ -138,7 +208,11 @@ function convertStepToLua(stepObj, stepIdx, defaultMapId, guideInfo) {
             const x = parseFloat(parts[0]).toFixed(2);
             const y = parseFloat(parts[1]).toFixed(2);
             if (!isNaN(x) && !isNaN(y)) {
-                locations.push(`{ "|${mapId}|${x}|${y}", npc = ${npcId || 'nil'}, label = "${escapeLua(npcName || questName)}" }`);
+                let locLabel = npcName || questName;
+                if (locLabel) {
+                    locLabel = translateTravel(locLabel);
+                }
+                locations.push(`{ "|${mapId}|${x}|${y}", npc = ${npcId || 'nil'}, label = "${escapeLua(locLabel)}" }`);
             }
         }
 
@@ -172,7 +246,15 @@ function convertStepToLua(stepObj, stepIdx, defaultMapId, guideInfo) {
             if (npcId) tasksLua.push(`{ npc = ${npcId} }`);
             tasksLua.push(`{ learntaxi = true }`);
         } else if (action === 'Fly') {
-            desc = `Utiliza el maestro de vuelo para volar hacia ${questName || 'tu próximo destino'}.`;
+            let dest = questName || 'tu próximo destino';
+            if (dest.toLowerCase().startsWith('to ')) {
+                dest = dest.slice(3).trim();
+            }
+            const cleanDest = dest.toLowerCase().trim().replace(/[><]/g, '');
+            if (TRAVEL_MAP[cleanDest]) {
+                dest = TRAVEL_MAP[cleanDest];
+            }
+            desc = `Utiliza el maestro de vuelo para volar hacia ${dest}.`;
             if (npcId) tasksLua.push(`{ npc = ${npcId} }`);
             tasksLua.push(`{ taketaxi = true }`);
         } else if (action === 'Train') {
@@ -182,7 +264,13 @@ function convertStepToLua(stepObj, stepIdx, defaultMapId, guideInfo) {
             desc = `Visita al comerciante para reparar armadura, vaciar inventario y reponer provisiones.`;
             tasksLua.push(`{ merchant = SUPPLIES, optional = true }`);
         } else {
-            desc = `${questName || npcName || 'Prosigue por la ruta de viaje recomendada.'}`;
+            let cleanDesc = questName || npcName;
+            if (cleanDesc) {
+                cleanDesc = translateTravel(cleanDesc);
+            } else {
+                cleanDesc = 'Prosigue por la ruta de viaje recomendada.';
+            }
+            desc = cleanDesc;
             if (questId) tasksLua.push(`{ complete = ${questId} }`);
         }
 

@@ -24,9 +24,11 @@ function TaskType:RenderFunc(task, container)
 	task.suppressWarning = task.suppressWarning or TurninOnlyQuests[questID]
 	if ((questStatus == 0 or (questStatus < 2 and hasObjectives)) and not task.suppressWarning) then
 		if (questStatus == 0) then
-			task.warn = string.format("|c%sYou don't have this quest|r", Color.RED_TEXT)
+			local msg = L["You don't have this quest"] or "You don't have this quest"
+			task.warn = string.format("|c%s%s|r", Color.RED_TEXT, msg)
 		else
-			task.warn = string.format("|c%sQuest is not ready to be turned in|r", Color.RED_TEXT)
+			local msg = L["Quest is not ready to be turned in"] or "Quest is not ready to be turned in"
+			task.warn = string.format("|c%s%s|r", Color.RED_TEXT, msg)
 		end
 		for _, taskGroup in ipairs(task.root) do
 			for _, task_ in ipairs(taskGroup) do

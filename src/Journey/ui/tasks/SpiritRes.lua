@@ -16,9 +16,9 @@ end
 function TaskType:RenderFunc(task, container)
     container.text:SetShown(true)
     if (UnitIsDead("player")) then
-        container.text:SetText("Res at the Spirit Healer (Release Spirit)")
+        container.text:SetText(L["Res at the Spirit Healer (Release Spirit)"] or "Revive con el Ángel de la Resurrección (Liberar espíritu)")
     else
-        container.text:SetText("Res at the Spirit Healer")
+        container.text:SetText(L["Res at the Spirit Healer"] or "Revive con el Ángel de la Resurrección")
     end
 end
 

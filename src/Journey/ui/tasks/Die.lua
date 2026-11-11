@@ -15,7 +15,7 @@ end
 
 function TaskType:RenderFunc(task, container)
     container.text:SetShown(true)
-    container.text:SetText("Die on purpose")
+    container.text:SetText(L["Die on purpose"] or "Morir a propósito")
 end
 
 function TaskType:Setup(task)

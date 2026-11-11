@@ -19,9 +19,9 @@ function TaskType:RenderFunc(task, container)
 	container.button:SetShown(true)
 	container:SetButtonColor(Color.MODE_NORMAL)
 	if ((task.root.hintLevel or 0) < task.hintbutton) then
-		container.button:SetText("Show a Hint")
+		container.button:SetText(L["Show a Hint"] or "Mostrar una pista")
 	else
-		container.button:SetText("Show Spoiler")
+		container.button:SetText(L["Show Spoiler"] or "Mostrar solución")
 	end
 	container.button:SetScript("OnClick", function()
 		task.root.hintLevel = (task.root.hintLevel or 0) + 1

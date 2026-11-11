@@ -65,6 +65,53 @@ NPCGenders = {
     [1] = "female"
 }
 
+if (GetLocale() == "esES" or GetLocale() == "esMX") then
+    NPCRaces = {
+        [1] = "Humano",
+        [2] = "Orco",
+        [3] = "Enano",
+        [4] = "Elfo de la noche",
+        [5] = "No-muerto",
+        [6] = "Tauren",
+        [7] = "Gnomo",
+        [8] = "Trol",
+        [9] = "Goblin",
+        [10] = "Elfo de sangre",
+        [11] = "Draenei",
+        [12] = "Orco vil",
+        [13] = "Naga",
+        [14] = "Tábido",
+        [15] = "Esqueleto",
+        [16] = "Vrykul",
+        [17] = "Colmillar",
+        [18] = "Trol del bosque",
+        [19] = "Taunka",
+        [20] = "Esqueleto de Rasganorte",
+        [21] = "Trol de hielo",
+        [22] = "Huargen",
+        [23] = "Gilneano",
+        [24] = "Pandaren",
+        [25] = "Pandaren de la Alianza",
+        [26] = "Pandaren de la Horda",
+        [27] = "Nocheterna",
+        [28] = "Tauren Monte Alto",
+        [29] = "Elfo del Vacío",
+        [30] = "Draenei forjado por la Luz",
+        [31] = "Trol Zandalari",
+        [32] = "Kul'tirano",
+        [33] = "Humano delgado",
+        [34] = "Enano Hierro Negro",
+        [35] = "Vulpera",
+        [36] = "Orco Mag'har",
+        [37] = "Mecagnomo"
+    }
+
+    NPCGenders = {
+        [0] = "varón",
+        [1] = "mujer"
+    }
+end
+
 NPCTypes = {
     [0] = "Humanoid",
     [1] = "Undead",

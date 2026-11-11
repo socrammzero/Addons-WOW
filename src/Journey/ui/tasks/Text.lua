@@ -38,7 +38,7 @@ function TaskType:RenderFunc(task, container)
 			detail:SetShown(true)
 		end
 	else
-		table.insert(output[1], task.text)
+		table.insert(output[1], L[task.text] or task.text)
 	end
 	container.text:SetText(table.concat(output[1]))
 	container.text:SetShown(true)
@@ -110,9 +110,11 @@ widgetHandlers = {
 			local itemCount = GetItemCount(widget.item, false)
 			local bankItemCount = GetItemCount(widget.item, true) - itemCount
 			if (bankItemCount > 0) then
-				table.insert(output[#output], string.format(" (%s in bags; %s in bank)", itemCount, bankItemCount))
+				local bagFmt = L[" (%s in bags; %s in bank)"] or " (%s en mochilas; %s en banco)"
+				table.insert(output[#output], string.format(bagFmt, itemCount, bankItemCount))
 			else
-				table.insert(output[#output], string.format(" (%s in bags)", itemCount))
+				local bagFmt = L[" (%s in bags)"] or " (%s en mochilas)"
+				table.insert(output[#output], string.format(bagFmt, itemCount))
 			end
 		end
 	end},
@@ -216,7 +218,7 @@ function collectWidgets(widget, output, colorTracker)
 		colorTracker[#colorTracker + 1] = "|c" .. Color[widget.color]
 	end
 	if (type(widget) == "string") then
-		table.insert(output[outputSize], widget)
+		table.insert(output[outputSize], L[widget] or widget)
 	else
 		-- if it is a known widget, render it
 		local widgetFound = false

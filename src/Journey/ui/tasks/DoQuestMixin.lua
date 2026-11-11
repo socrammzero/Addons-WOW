@@ -43,7 +43,8 @@ function DoQuestMixin:RenderFunc(task, container)
 	local objectivesMap = { }
 	task.warn = nil
 	if (QuestStatus.GetQuestStatus(questID) == 0) then
-		task.warn = string.format("|c%sYou don't have this quest|r", Color.RED_TEXT)
+		local noQuestMsg = L["You don't have this quest"] or "You don't have this quest"
+		task.warn = string.format("|c%s%s|r", Color.RED_TEXT, noQuestMsg)
 		for _, taskGroup in ipairs(task.root) do
 			for _, task_ in ipairs(taskGroup) do
 				if (questID == task_.accept) then
@@ -88,7 +89,7 @@ function DoQuestMixin:RenderFunc(task, container)
 				IconService.SetIconTexture(detail.icon, icon)
 				detail:SetAlpha(objective.finished and DIM or 1.0)
 				detail.hasIcon = true
-				local displayText = (objective.text and objective.text ~= "") and FormatQuestObjective(objective, questCompleted) or "Hidden Objective"
+				local displayText = (objective.text and objective.text ~= "") and FormatQuestObjective(objective, questCompleted) or (L["Hidden Objective"] or "Hidden Objective")
 				detail.text:SetText(displayText)
 				if (hasSpecifiedObjectives and not isSpecifiedObjective) then
 					detail:SetFontTiny()

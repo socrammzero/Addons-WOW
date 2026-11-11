@@ -14,6 +14,10 @@ function LocationMixin:GetMap()
 end
 
 function LocationMixin:GetTooltipLabel(useAlt)
+    local rawLabel = self.label
+    if (rawLabel and L[rawLabel]) then
+        rawLabel = L[rawLabel]
+    end
     if (self.npc) then
         local npcColor = NPCColor
         if (useAlt) then
@@ -24,10 +28,10 @@ function LocationMixin:GetTooltipLabel(useAlt)
         if (npcInfo) then
             name = string.format("|c%s%s|r", npcColor[GetNPCReaction(self.npc)], name)
         end
-        return string.format(self.label or npcInfo and NPCRaces[npcInfo.race] and "%s (%s %s)" or "%s",
+        return string.format(rawLabel or npcInfo and NPCRaces[npcInfo.race] and "%s (%s %s)" or "%s",
                 name, npcInfo and NPCRaces[npcInfo.race] or "", npcInfo and NPCGenders[npcInfo.gender] or "")
     end
-    if (self.label or self.quest or self.gameobject or self.area or self.wmoarea or self.item or self.zone
+    if (rawLabel or self.quest or self.gameobject or self.area or self.wmoarea or self.item or self.zone
             or self.taxi) then
         local subject = self.quest and (type(self.quest) == "number" and Names.GetQuestName(self.quest) or self.quest)
                 or self.gameobject and (type(self.gameobject) == "number" and Names.GetGameObjectName(self.gameobject) or self.gameobject)
@@ -47,12 +51,12 @@ function LocationMixin:GetTooltipLabel(useAlt)
                             or self.taxi and (useAlt and Color.TAXI_ALT or Color.TAXI),
                     subject)
         end
-        return string.format(self.label or "%s", subject)
+        return string.format(rawLabel or "%s", subject)
     end
     if (Flags.HasFlag(self, "H")) then
-        return "Hidden"
+        return L["Hidden"] or "Oculto"
     end
-    return "Follow Waypoint"
+    return L["Follow Waypoint"] or "Sigue el punto de ruta"
 end
 
 function LocationMixin:GetXY(mapID)

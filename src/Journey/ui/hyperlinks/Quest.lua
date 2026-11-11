@@ -23,9 +23,11 @@ local function TooltipShow(frame, questRef, refType)
     if (questRef.note) then
         GuideTooltip:AddLine(" ")
         if (refType == "skipped") then
-            GuideTooltip:AddLine(string.format("|c%sWhy Skipped?:|r", Color.SKIPPED_HEADING))
+            local heading = L["Why Skipped?:"] or "Why Skipped?:"
+            GuideTooltip:AddLine(string.format("|c%s%s|r", Color.SKIPPED_HEADING, heading))
         else
-            GuideTooltip:AddLine(string.format("|c%sNote:|r", Color.NOTE_HEADING))
+            local heading = L["Note:"] or "Note:"
+            GuideTooltip:AddLine(string.format("|c%s%s|r", Color.NOTE_HEADING, heading))
         end
         GuideTooltip:AddLine(questRef.note, 1, 1, 1, true)
     end

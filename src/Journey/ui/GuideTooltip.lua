@@ -148,7 +148,7 @@ function component.Init(components)
         GuideTooltip:SetNPC(npcIDs[1])
         if (#npcIDs > 1) then
             GuideTooltip:AddLine(" ")
-            GuideTooltip:AddLine("Also Targeting:")
+            GuideTooltip:AddLine(L["Also Targeting:"] or "También como objetivo:")
             for i = 2, #npcIDs do
                 local creatureInfo = GetCreatureInfo(npcIDs[i])
                 if (creatureInfo) then

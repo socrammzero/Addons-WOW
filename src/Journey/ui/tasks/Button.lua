@@ -13,7 +13,7 @@ end
 
 function TaskType:RenderFunc(task, container)
 	container.button:SetShown(true)
-	container.button:SetText(task.button)
+	container.button:SetText(L[task.button] or task.button)
 	if (task.color) then
 		container:SetButtonColor("FF" .. task.color)
 	elseif (ConditionContext["HC"]) then

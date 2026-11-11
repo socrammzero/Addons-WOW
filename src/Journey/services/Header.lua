@@ -25,13 +25,13 @@ function HeaderService.GetHeaderTitles()
         if (SoDSkillLineAbilityID
                 and State.GetRuneSpoilerLevel(SoDSkillLineAbilityID) == 0
                 and not RunesService.IsRuneGuideComplete(currentGuide.id)) then
-            title1 = "Mysterious Rune"
+            title1 = L["Mysterious Rune"] or "Mysterious Rune"
         else
-            title1 = currentGuide.info.description
+            title1 = L[currentGuide.info.description] or currentGuide.info.description
         end
         if (zoneTitle) then
             title2 = title1
-            title1 = zoneTitle
+            title1 = L[zoneTitle] or zoneTitle
         end
     end
     return title1, title2

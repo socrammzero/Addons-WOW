@@ -67,7 +67,7 @@ function component:Init()
     end
     local title2 = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     title2:SetPoint("TOP", title, "BOTTOM", 0, -6)
-    title2:SetText("Advanced Options")
+    title2:SetText(L["Advanced Options"] or "Opciones avanzadas")
 
     local lastComponent
     local hcTooltip
@@ -221,7 +221,7 @@ function component:Init()
         arrowTextSizeSlider:SetEnabled(not slidersDisabled)
     end
     table.insert(options,{
-        text = "Enable HUD Waypoint Arrow",
+        text = L["Enable HUD Waypoint Arrow"] or "Enable HUD Waypoint Arrow",
         tooltip = "Display a large on-screen arrow pointing toward the current waypoint\n\n(setting saved account-wide)",
         isNotRadio = true,
         notCheckable = false,
@@ -234,7 +234,7 @@ function component:Init()
         end
     })
     table.insert(options,{
-        text = "Use TomTom (when available) as the HUD Arrow",
+        text = L["Use TomTom (when available) as the HUD Arrow"] or "Use TomTom (when available) as the HUD Arrow",
         tooltip = "Use TomTom's arrow instead of the built-in arrow\n\n(requires TomTom to be installed and enabled)\n\n(setting saved account-wide)",
         isNotRadio = true,
         notCheckable = false,
@@ -252,7 +252,7 @@ function component:Init()
     })
     table.insert(options,{
         slider = true,
-        text = "Arrow Size:",
+        text = L["Arrow Size:"] or "Arrow Size:",
         min = 0.5,
         max = 2.0,
         step = 0.05,
@@ -270,7 +270,7 @@ function component:Init()
     })
     table.insert(options,{
         slider = true,
-        text = "Arrow Text Size:",
+        text = L["Arrow Text Size:"] or "Arrow Text Size:",
         min = 0.5,
         max = 2.0,
         step = 0.05,
@@ -318,7 +318,7 @@ function component:Init()
     --},
     table.insert(options,{
         slider = true,
-        text = "Guide Size:",
+        text = L["Guide Size:"] or "Guide Size:",
         min = 0.75,
         max = 1.75,
         step = 0.05,
@@ -360,17 +360,17 @@ function component:Init()
             component:SetSize(1, 32)
             component.dropdown = CreateFrame("Frame", addonName .. "SoundDropDownButton1", component, "UIDropDownMenuTemplate")
             component.dropdown:SetPoint("LEFT", component.label, "RIGHT", -12, -2)
-            component.dropdown.Text:SetText(AlertSoundsLUT[State.GetNPCAlertSound()] or "None")
+            component.dropdown.Text:SetText(AlertSoundsLUT[State.GetNPCAlertSound()] or (L["None"] or "None"))
             component.dropdownMenu = TieredMenu.CreateMenu(component)
             local menu = { }
             table.insert(menu, {
-                text = "None",
+                text = L["None"] or "None",
                 checked = function()
                     return State.GetNPCAlertSound() == nil
                 end,
                 func = function()
                     State.SetNPCAlertSound(nil)
-                    component.dropdown.Text:SetText("None")
+                    component.dropdown.Text:SetText(L["None"] or "None")
                     component.dropdownMenu:Display(false)
                 end
             })

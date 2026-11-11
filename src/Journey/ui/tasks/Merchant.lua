@@ -47,7 +47,8 @@ end
 function TaskType:RenderFunc(task, container)
 	container.text:SetShown(true)
 	task.iconOverride = iconOverrides[task.merchant]
-	container.text:SetText(defaultText[task.merchant])
+	local text = defaultText[task.merchant]
+	container.text:SetText(L[text] or text)
 end
 
 RegisterTaskType(TaskType)

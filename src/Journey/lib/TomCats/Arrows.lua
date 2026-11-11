@@ -208,16 +208,28 @@ local function UpdateScreenArrow(rads, distance, label)
             if (not screenArrow.arrowTexture:IsShown()) then screenArrow.arrowTexture:Show() end
             SetArrowDirection(screenArrow.arrowTexture, rads)
         end
-        local shadowText = StripColorCodes(label or "")
+        local locLabel = label or ""
+        if (locLabel ~= "") then
+            if (L[locLabel]) then
+                locLabel = L[locLabel]
+            else
+                local clean = locLabel:match("^%s*(.-)%s*$")
+                if (clean and L[clean]) then
+                    locLabel = L[clean]
+                end
+            end
+        end
+        local shadowText = StripColorCodes(locLabel)
         if (shadowText ~= screenArrow.lastLabelText) then
             screenArrow.lastLabelText = shadowText
             for _, shadow in ipairs(screenArrow.shadowContainer.labels) do
                 shadow:SetText(shadowText)
             end
-            screenArrow.label:SetText(label or "")
+            screenArrow.label:SetText(locLabel)
         end
         if (distance) then
-            local distText = math.floor(distance + 0.5) .. " yards"
+            local distUnit = L["m"] or "m"
+            local distText = math.floor(distance + 0.5) .. " " .. distUnit
             if (distText ~= screenArrow.lastDistText) then
                 screenArrow.lastDistText = distText
                 for _, shadow in ipairs(screenArrow.distShadowContainer.labels) do

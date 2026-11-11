@@ -56,17 +56,18 @@ local function createGuideMenu()
 							})
 							currentPrefix = prefix
 						end
+						local groupText = L[guideInfo.group] or guideInfo.group
 						submenu = { }
 						table.insert(
 								submenu,
 								{
-									text = guideInfo.group,
+									text = groupText,
 									isTitle = true,
 									notCheckable = true
 								})
 						submenus[guideInfo.group] = submenu
 						table.insert(menuData, {
-							text = guideInfo.group,
+							text = groupText,
 							hasArrow = true,
 							menuList = submenu,
 							notCheckable = true
@@ -75,10 +76,11 @@ local function createGuideMenu()
 					_menu = submenu
 				end
 				local descriptionFormat = installed and (compatible and "%s" or "|cFFFF9900%s|r") or "|cFFFF0000%s|r"
-				local menuText = string.format(descriptionFormat, guideInfo.description)
+				local localizedDesc = L[guideInfo.description] or guideInfo.description
+				local menuText = string.format(descriptionFormat, localizedDesc)
 				local text2
 				if (Flags.HasFlag(guideInfo, "F")) then
-					text2 = "FREE"
+					text2 = L["FREE"] or "GRATIS"
 				end
 				local guideMenuItem = {
 					text = menuText,
