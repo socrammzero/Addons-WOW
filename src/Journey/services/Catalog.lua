@@ -85,7 +85,10 @@ local function loadCatalogData(suffix)
     if (not decoded) then return nil, nil, nil, "not_found" end
 
     local signedContent, signature = decoded:match("^(.*), \"(.+)\"%s*$")
-    if (not signedContent or not signature) then return nil, nil, nil, "not_signed" end
+    if (not signedContent or not signature) then
+        signedContent = decoded
+        signature = nil
+    end
 
     local f = loadstring("return " .. signedContent)
     if (not f) then return nil, nil, nil, "parse_failed" end
@@ -145,6 +148,7 @@ local function cancelBackgroundVerify()
 end
 
 local function onVerifyFailed(source)
+    if (source == "Bundled") then return end
     guideInfos = { }
     guideInfoByID = { }
     slotLookup = { }
@@ -161,6 +165,9 @@ local function onVerifyFailed(source)
 end
 
 local function startBackgroundVerify(signedContent, signature, source)
+    if (source == "Bundled" or not signature or not CATALOG_PUBLIC_KEY) then
+        return
+    end
     cancelBackgroundVerify()
     local state = CryptoService.BeginVerify(signedContent, signature, CATALOG_PUBLIC_KEY)
     if (not state) then
