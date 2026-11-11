@@ -34,7 +34,7 @@ function component.Update()
 		end
 		local stepText = State.IsStepIDEnabled() and HeaderService.GetStepText()
 		if (stepText) then
-			component.text:SetText(("Step: %s"):format(stepText))
+			component.text:SetText((L["Step: %s"] or "Step: %s"):format(stepText))
 			component.text:SetShown(true)
 		else
 			component.text:SetShown(false)

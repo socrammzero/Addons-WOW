@@ -14,11 +14,11 @@ end
 
 local function getSectionHeading(prefix, hasForever)
 	if (prefix == "Classic Era" and hasForever) then
-		return "Classic Era Guides (Fallback)"
+		return L["Classic Era Guides"] and (L["Classic Era Guides"] .. " (Fallback)") or "Classic Era Guides (Fallback)"
 	elseif (prefix == "Classic Era") then
-		return "Classic Era Guides"
+		return L["Classic Era Guides"] or "Classic Era Guides"
 	else
-		return prefix .. " Guides"
+		return L[prefix .. " Guides"] or (prefix .. " Guides")
 	end
 end
 
@@ -258,7 +258,7 @@ local function createGuideMenu()
 				menuData,
 				1,
 				{
-					text = "Resume Rune Guide",
+					text = L["Resume Rune Guide"],
 					notCheckable = true,
 					func = function()
 						GuideNavigationService.Goto(returnToRuneGuide)
@@ -271,7 +271,7 @@ local function createGuideMenu()
 				menuData,
 				1,
 				{
-					text = "Resume Leveling Guide",
+					text = L["Resume Leveling Guide"],
 					notCheckable = true,
 					func = function()
 						GuideNavigationService.Goto(returnToLevelingGuide)
@@ -298,7 +298,7 @@ local function createGuideMenu()
 	table.insert(
 			menuData,
 			{
-				text = "Advanced Options",
+				text = L["Advanced Options"],
 				notCheckable = true,
 				func = function()
 					UI.OpenConfigurationWindow()
