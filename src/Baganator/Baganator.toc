@@ -5,7 +5,7 @@
 ## Title-esMX: Baganator
 ## Notes-esES: Gestor de inventario y bolsas para World of Warcraft.
 ## Notes-esMX: Gestor de inventario y bolsas para World of Warcraft.
-## Version: 855
+## Version: 856
 ## Author: plusmouse
 ## OptionalDeps: Syndicator, Masque
 ## SavedVariables: BAGANATOR_CONFIG, BAGANATOR_DATA

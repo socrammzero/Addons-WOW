@@ -20,7 +20,7 @@ local needsInstallerRun
 local function initBattleTag()
     if (not previousBattleTagCaptured) then
         previousBattleTagCaptured = true
-        previousBattleTag = SavedVariables.battleTag and SavedVariables.battleTag:lower() or nil
+        previousBattleTag = SavedVariables.battleTag and UTF8.Lower(SavedVariables.battleTag) or nil
         needsInstallerRun = SavedVariables.needsInstallerRun
     end
     local _, liveTag = BNGetInfo()
@@ -105,13 +105,13 @@ end
 
 local function getBattleTag()
     local tag = SavedVariables.battleTag
-    return tag and tag:lower() or nil
+    return tag and UTF8.Lower(tag) or nil
 end
 
 local function deriveDecryptKey(battleTags)
     local sorted = {}
     for _, tag in ipairs(battleTags) do
-        table.insert(sorted, tag:lower())
+        table.insert(sorted, UTF8.Lower(tag))
     end
     table.sort(sorted)
     return table.concat(sorted, "")
@@ -128,7 +128,7 @@ local function tryLoadExternalCatalog()
         local playerTag = getBattleTag()
         if (playerTag) then
             for _, tag in ipairs(catalogData.battleTags) do
-                if (tag:lower() == playerTag) then
+                if (UTF8.Lower(tag) == playerTag) then
                     catalogDecryptKey = deriveDecryptKey(catalogData.battleTags)
                     break
                 end

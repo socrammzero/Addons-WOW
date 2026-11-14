@@ -36,10 +36,13 @@ end
 
 -- Deprecated: Remove this once Era guides are fully migrated to Forever context including guide ID conditions and
 -- goto buttons have been resolved
-function Brand.registerGuideAlias(guideID, context)
+function Brand.registerGuideAlias(guideID, context, registeredGuideIds)
 	local baseID = guideID:match("^(.+)_FVR$")
 	if (baseID) then
 		context[baseID] = true
+		if (registeredGuideIds) then
+			table.insert(registeredGuideIds, baseID)
+		end
 	end
 end
 
