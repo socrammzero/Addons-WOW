@@ -11,6 +11,7 @@ ns.EXTRA_L, ns.EXTRA_FLS = L, FLS;
 local function Sparkles(t)
 	local how = t.how;
 	return {
+		how = how,
 		enabled = t.enabled,
 		enabledTip = t.enabledTip,
 		header = t.header,
@@ -30,6 +31,8 @@ end
 ---------------------------------------------------------------------------
 
 L.esES = {
+	footlocker = "Baúles (forzar cerraduras)",
+	FOOTLOCKER_TOOLTIP = "Destellos en los baúles que los pícaros pueden forzar, p. ej. baúles maltrechos, abollados o empapados. Se vuelven grises si tu habilidad de forzar cerraduras es demasiado baja.",
 	PANEL_NAME = "Colores",
 	TITLE = "Forever Loot Sparkles - Colores",
 	DESCRIPTION = "Elige un color de destello para cada categoría. Fuera de alcance los destellos son más tenues y siguen volviéndose grises cuando no se puede usar un objeto.",
@@ -79,6 +82,8 @@ FLS.esMX = FLS.esES;
 ---------------------------------------------------------------------------
 
 L.ptBR = {
+	footlocker = "Baús (abrir fechaduras)",
+	FOOTLOCKER_TOOLTIP = "Brilhos nos baús que ladinos podem arrombar, p. ex. baús surrados, amassados ou encharcados. Ficam cinza quando sua perícia em abrir fechaduras é baixa demais.",
 	PANEL_NAME = "Cores",
 	TITLE = "Forever Loot Sparkles - Cores",
 	DESCRIPTION = "Escolha uma cor de brilho para cada categoria. Fora de alcance os brilhos ficam mais fracos e continuam ficando cinza quando um objeto não pode ser usado.",
@@ -126,6 +131,8 @@ FLS.ptBR = Sparkles({
 ---------------------------------------------------------------------------
 
 L.itIT = {
+	footlocker = "Bauli (scassinare)",
+	FOOTLOCKER_TOOLTIP = "Scintillii sui bauli che i ladri possono scassinare, ad es. bauli malconci, ammaccati o fradici. Diventano grigi se la tua abilità di scassinare è troppo bassa.",
 	PANEL_NAME = "Colori",
 	TITLE = "Forever Loot Sparkles - Colori",
 	DESCRIPTION = "Scegli un colore di scintillio per ogni categoria. Fuori portata gli scintillii restano più tenui e diventano comunque grigi quando un oggetto non si può usare.",
@@ -173,6 +180,8 @@ FLS.itIT = Sparkles({
 ---------------------------------------------------------------------------
 
 L.ruRU = {
+	footlocker = "Сундучки (взлом замков)",
+	FOOTLOCKER_TOOLTIP = "Мерцание на сундучках, которые разбойники могут вскрыть, например потрепанных, помятых или промокших. Становится серым, если навык взлома замков слишком низкий.",
 	PANEL_NAME = "Цвета",
 	TITLE = "Forever Loot Sparkles - Цвета",
 	DESCRIPTION = "Выберите цвет мерцания для каждой категории. Вне досягаемости мерцание тусклее и по-прежнему становится серым, если объект нельзя использовать.",
@@ -220,6 +229,8 @@ FLS.ruRU = Sparkles({
 ---------------------------------------------------------------------------
 
 L.koKR = {
+	footlocker = "사물함 (자물쇠 따기)",
+	FOOTLOCKER_TOOLTIP = "도적이 자물쇠를 딸 수 있는 사물함이 반짝입니다(예: 낡은 사물함, 찌그러진 사물함, 물에 젖은 사물함). 자물쇠 따기 숙련도가 너무 낮으면 회색으로 바뀝니다.",
 	PANEL_NAME = "색상",
 	TITLE = "Forever Loot Sparkles - 색상",
 	DESCRIPTION = "분류마다 반짝임 색상을 고르세요. 사거리 밖에서는 반짝임이 더 흐리며, 사용할 수 없는 물체에서는 여전히 회색으로 바뀝니다.",
@@ -267,6 +278,8 @@ FLS.koKR = Sparkles({
 ---------------------------------------------------------------------------
 
 L.zhCN = {
+	footlocker = "提箱（开锁）",
+	FOOTLOCKER_TOOLTIP = "潜行者可以撬开的提箱会闪光，例如破损的提箱、凹陷的提箱或浸水的提箱。开锁技能太低时会变灰。",
 	PANEL_NAME = "颜色",
 	TITLE = "Forever Loot Sparkles - 颜色",
 	DESCRIPTION = "为每个类别选择闪光颜色。超出范围时闪光较暗，物体无法使用时仍会变灰。",
@@ -314,6 +327,8 @@ FLS.zhCN = Sparkles({
 ---------------------------------------------------------------------------
 
 L.zhTW = {
+	footlocker = "提箱（開鎖）",
+	FOOTLOCKER_TOOLTIP = "盜賊可以撬開的提箱會閃光，例如破損的提箱、凹陷的提箱或浸水的提箱。開鎖技能太低時會變灰。",
 	PANEL_NAME = "顏色",
 	TITLE = "Forever Loot Sparkles - 顏色",
 	DESCRIPTION = "為每個類別選擇閃光顏色。超出範圍時閃光較暗，物件無法使用時仍會變灰。",

@@ -94,46 +94,55 @@
     },
     {
       "name": "GearQuestForever_DRUID",
+      "folderName": "GearQuestForever_DRUID",
       "sync": true,
       "description": "Datos de clase (Druida) para GearQuest Forever."
     },
     {
       "name": "GearQuestForever_HUNTER",
+      "folderName": "GearQuestForever_HUNTER",
       "sync": true,
       "description": "Datos de clase (Cazador) para GearQuest Forever."
     },
     {
       "name": "GearQuestForever_MAGE",
+      "folderName": "GearQuestForever_MAGE",
       "sync": true,
       "description": "Datos de clase (Mago) para GearQuest Forever."
     },
     {
       "name": "GearQuestForever_PALADIN",
+      "folderName": "GearQuestForever_PALADIN",
       "sync": true,
       "description": "Datos de clase (Paladín) para GearQuest Forever."
     },
     {
       "name": "GearQuestForever_PRIEST",
+      "folderName": "GearQuestForever_PRIEST",
       "sync": true,
       "description": "Datos de clase (Sacerdote) para GearQuest Forever."
     },
     {
       "name": "GearQuestForever_ROGUE",
+      "folderName": "GearQuestForever_ROGUE",
       "sync": true,
       "description": "Datos de clase (Pícaro) para GearQuest Forever."
     },
     {
       "name": "GearQuestForever_SHAMAN",
+      "folderName": "GearQuestForever_SHAMAN",
       "sync": true,
       "description": "Datos de clase (Chamán) para GearQuest Forever."
     },
     {
       "name": "GearQuestForever_WARLOCK",
+      "folderName": "GearQuestForever_WARLOCK",
       "sync": true,
       "description": "Datos de clase (Brujo) para GearQuest Forever."
     },
     {
       "name": "GearQuestForever_WARRIOR",
+      "folderName": "GearQuestForever_WARRIOR",
       "sync": true,
       "description": "Datos de clase (Guerrero) para GearQuest Forever."
     },

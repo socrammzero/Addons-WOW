@@ -24,6 +24,7 @@ ns.DEFAULT_COLORS = {
 	ore = { 1.00, 0.55, 0.20 },
 	quest = { 1.00, 0.88, 0.52 },
 	corpseLoot = { 0.75, 0.50, 1.00 },
+	footlocker = { 1.00, 0.96, 0.41 }, -- rogue class color
 };
 
 local db;

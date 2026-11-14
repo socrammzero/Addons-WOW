@@ -3,6 +3,12 @@ local addonTable = select(2, ...)
 
 addonTable.ItemButtonUtil = {}
 
+local itemButtonFocus
+
+function addonTable.ItemButtonUtil.GetGamepadFocus()
+  return itemButtonFocus
+end
+
 local itemCallbacks = {}
 local iconSettings = {}
 
@@ -648,7 +654,9 @@ function BaganatorRetailLiveContainerItemButtonMixin:SetItemDetails(cacheData)
 
   self:UpdateExtended();
   self:UpdateJunkItem(quality, noValue);
-  self:SetReadable(readable);
+  if not addonTable.Constants.IsGamepadInUse then -- This taints the SmartNav, so we skip it
+    self:SetReadable(readable);
+  end
   self:SetMatchesSearch(true)
   self.Cooldown:Hide()
 
@@ -746,6 +754,62 @@ function BaganatorRetailLiveContainerItemButtonMixin:ClearNewItem()
   if (self.flashAnim:IsPlaying() or self.newitemglowAnim:IsPlaying()) then
     self.flashAnim:Stop();
     self.newitemglowAnim:Stop();
+  end
+end
+
+local clicker = CreateFrame("Button", "BaganatorItemButtonClicker", UIParent, "SecureActionButtonTemplate")
+clicker:SetAttribute("type2", "click")
+clicker:RegisterForClicks("AnyDown")
+local stopTargeting = CreateFrame("Button", "BaganatorItemButtonStopTargeting", UIParent, "SecureActionButtonTemplate")
+stopTargeting:SetAttribute("type1", "stop")
+stopTargeting:RegisterForClicks("AnyDown", "AnyUp")
+local clearCursorButton = CreateFrame("Button", "BaganatorItemButtonClearCursor", UIParent)
+clearCursorButton:SetScript("OnClick", function()
+  ClearCursor()
+end)
+
+clicker:HookScript("OnClick", function()
+  if SpellIsTargeting() then
+    SetOverrideBindingClick(stopTargeting, true, "PAD2", stopTargeting:GetName())
+  end
+end)
+
+if addonTable.Constants.IsGamepadInUse then
+  local monitor = CreateFrame("Frame")
+  monitor:RegisterEvent("PLAYER_REGEN_DISABLED")
+  monitor:RegisterEvent("CURSOR_CHANGED")
+  monitor:SetScript("OnEvent", function(_, eventName)
+    if eventName == "PLAYER_REGEN_DISABLED" then
+      ClearOverrideBindings(clicker)
+    elseif not InCombatLockdown() then
+      ClearOverrideBindings(stopTargeting)
+      ClearOverrideBindings(clearCursorButton)
+
+      if not InCombatLockdown() and eventName == "CURSOR_CHANGED" and GetCursorInfo() == "item" then
+        SetOverrideBindingClick(clearCursorButton, true, "PAD2", clearCursorButton:GetName())
+      end
+    end
+  end)
+end
+
+function BaganatorRetailLiveContainerItemButtonMixin:OnSmartNavSelect()
+  if InCombatLockdown() or not self.BGR or not self.BGR.itemLink then
+    return
+  end
+  clicker:SetAttribute("clickbutton2", self)
+  SetOverrideBindingClick(clicker, true, "PAD3", clicker:GetName(), "RightButton")
+  if self.gamepadIndex then
+    itemButtonFocus = {index = self.gamepadIndex, slot = self:GetID(), bag = self:GetParent():GetID()}
+  end
+end
+
+function BaganatorRetailLiveContainerItemButtonMixin:OnSmartNavDeselect()
+  if InCombatLockdown() then
+    return
+  end
+  ClearOverrideBindings(clicker)
+  if self.gamepadIndex then
+    itemButtonFocus = nil
   end
 end
 

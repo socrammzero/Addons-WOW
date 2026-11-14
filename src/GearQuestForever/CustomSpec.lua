@@ -18,8 +18,8 @@ local FOLD_INTO = {
 local DEAD_STAT = { expertise = true, armorPen = true, resilience = true }
 
 local FIELDS = {
-    { key = "dpsWeight", label = "Weapon damage", weapon = true },
-    { key = "dpsWeightRanged", label = "Ranged weapon damage", weapon = true },
+    { key = "dpsWeight", label = "Weapon DPS", weapon = true },
+    { key = "dpsWeightRanged", label = "Ranged weapon DPS", weapon = true },
     { key = "speedWeight", label = "Weapon speed", weapon = true },
     { key = "str", label = "Strength" },
     { key = "agi", label = "Agility" },
@@ -234,7 +234,8 @@ function GQ.Custom:Weights(classFile, record, level)
     local leveling = GQ.ScoringLeveling
     if leveling and (tonumber(level) or 1) <= (leveling.untilLevel or 60) then
         for key, mult in pairs(leveling) do
-            if key ~= "untilLevel" and type(mult) == "number" and weights[key] and not typed[key] then
+            if key ~= "untilLevel" and type(mult) == "number" and weights[key] and not typed[key]
+                and not (record.base == "enhancement" and key == "int") then
                 weights[key] = weights[key] * mult
             end
         end

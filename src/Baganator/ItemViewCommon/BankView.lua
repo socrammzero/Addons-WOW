@@ -12,6 +12,14 @@ function BaganatorItemViewCommonBankViewMixin:OnLoad()
   self:SetClampedToScreen(true)
   self:SetUserPlaced(false)
 
+  if addonTable.Constants.IsGamepadInUse then
+    self.layoutType = "ButtonFrameTemplateNoPortrait"
+    self.FrameGlow = CreateFrame("Frame", nil, self, "FrameGlowTemplate")
+  end
+  for _, b in ipairs(self.AllFixedButtons) do
+    addonTable.Gamepad.OneWayLink(b, "Down", self.SearchWidget)
+  end
+
   self.Anchor = addonTable.ItemViewCommon.GetAnchorSetter(self, addonTable.Config.Options.BANK_ONLY_VIEW_POSITION)
 
   self.tabPool = addonTable.ItemViewCommon.GetTabButtonPool(self)
@@ -44,6 +52,8 @@ function BaganatorItemViewCommonBankViewMixin:OnLoad()
   self.CustomiseButton:SetPoint("TOP", self, 0, -1 + addonTable.Constants.ButtonFrameOffsetTop)
 
   self:UpdateTransferButton()
+
+  addonTable.Gamepad.LinkButtons(self.CustomiseButton, "Down", self.SearchWidget.SearchBox)
 
   addonTable.Skins.AddFrame("ButtonFrame", self, {"bank"})
 end
@@ -145,6 +155,11 @@ function BaganatorItemViewCommonBankViewMixin:OnEvent(eventName)
 end
 
 function BaganatorItemViewCommonBankViewMixin:OnShow()
+  if addonTable.Constants.IsGamepadInUse then
+    addonTable.Gamepad.AnnounceShow(self)
+    self.showing = true
+  end
+
   if Syndicator.Constants.WarbandBankActive then
     if C_PlayerInteractionManager.IsInteractingWithNpcOfType(Enum.PlayerInteractionType.AccountBanker) then
       self:SetTab(2)
@@ -180,6 +195,8 @@ function BaganatorItemViewCommonBankViewMixin:OnHide()
   if BankFrame.BankPanel then
     BankFrame.BankPanel:Hide()
   end
+
+  addonTable.Gamepad.AnnounceHide(self)
 
   addonTable.CallbackRegistry:TriggerEvent("SearchTextChanged", "")
   addonTable.CallbackRegistry:TriggerEvent("ItemContextChanged")
@@ -235,13 +252,22 @@ function BaganatorItemViewCommonBankViewMixin:GetBankType()
 end
 
 
-function BaganatorItemViewCommonBankViewMixin:OnTabFinished()
+function BaganatorItemViewCommonBankViewMixin:OnTabFinished(firstButton, lastButton)
   self.SortButton:SetShown(self.currentTab.isLive and not self.currentTab.isLocked and addonTable.Utilities.ShouldShowSortButton())
   self:UpdateTransferButton()
 
   self.ButtonVisibility:Update()
 
   self:SetSize(self.currentTab:GetSize())
+
+  self.SearchWidget:LinkDown(firstButton)
+
+  if self.showing then
+    C_Timer.After(0, function()
+      addonTable.Gamepad.SetTargetButton(self, firstButton)
+    end)
+    self.showing = false
+  end
 
   if addonTable.Config.Get(addonTable.Config.Options.DEBUG_TIMERS) then
     addonTable.Utilities.DebugOutput("bank", debugprofilestop() - self.start)
@@ -260,6 +286,14 @@ end
 
 function BaganatorItemViewCommonBankViewMixin:GetExternalSortMethodName()
   return addonTable.Utilities.GetExternalSortMethodName()
+end
+
+function BaganatorItemViewCommonBankViewMixin:StartFocus()
+  self.FrameGlow:Show()
+end
+
+function BaganatorItemViewCommonBankViewMixin:EndFocus()
+  self.FrameGlow:Hide()
 end
 
 if table.freeze then

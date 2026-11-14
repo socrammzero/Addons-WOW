@@ -1,9 +1,9 @@
 ## Interface: 11509, 16001, 20506, 50504, 120105
 ## Title: HealBot Tooltips
-## Title-esES: HealBot: Descripciones emergentes
-## Title-esMX: HealBot: Descripciones emergentes
 ## Author: Strife
 ## Notes: Show tooltips on HealBot frames and in HealBot options.
+## Title-esES: HealBot: Descripciones emergentes
+## Title-esMX: HealBot: Descripciones emergentes
 ## Notes-esES: Muestra descripciones emergentes en los marcos y en las opciones de HealBot.
 ## Notes-esMX: Muestra descripciones emergentes en los marcos y en las opciones de HealBot.
 ## RequiredDeps: HealBot

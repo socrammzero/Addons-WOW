@@ -8,8 +8,6 @@ local FRAME_HEIGHT = 512
 local ROW_HEIGHT = 16
 -- A hunt is two of those lines: the name, then the notes.
 local TAB_HEIGHT = 24
-local TAB_BAR_PAD = 4
-local TAB_ROW_HEIGHT = TAB_HEIGHT + TAB_BAR_PAD
 local CONTEXT_BAND_HEIGHT = 46
 local CONTEXT_BAND_TOP = -27
 local TAB_TOP_OFFSET = 56 + CONTEXT_BAND_HEIGHT
@@ -20,7 +18,6 @@ local PORTRAIT_OFFSET_Y = 7
 
 -- Track and Show on map sit inside the description. Remove sits to the right of those.
 -- A removed hunt's parchment shows Restore only. Exit sits in the footer on every tab.
-local HEADER_OFFSET = 74
 local FOOTER_OFFSET = 42
 local FOOTER_BUTTON_Y = 14
 local DETAIL_BUTTON_BAND = 36
@@ -30,15 +27,18 @@ local COLUMN_GAP = 8
 local USABLE_WIDTH = FRAME_WIDTH - CONTENT_LEFT - CONTENT_RIGHT_GUTTER
 local LEFT_COLUMN_WIDTH = math.floor((USABLE_WIDTH - COLUMN_GAP) / 2)
 local RIGHT_COLUMN_WIDTH = USABLE_WIDTH - COLUMN_GAP - LEFT_COLUMN_WIDTH
-local PANEL_WIDTH = LEFT_COLUMN_WIDTH
 local PANEL_INSET = 4
-local GUTTER_INSET = 6
-local PAGE_TAB_LOG_WIDTH = 108
-local PAGE_TAB_SIM_WIDTH = 92
-local FILTER_TAB_WIDTH = 84
-local PAGE_GROUP_WIDTH = PAGE_TAB_LOG_WIDTH + PAGE_TAB_SIM_WIDTH + 4
 local FILTER_TAB_OVERLAP = 3
 local FILTER_TAB_LEFT = 12
+-- Four list tabs share the row and stop short of the Filter button.
+local LIST_TAB_COUNT = 4
+local LIST_TAB_GAP = 4
+local LIST_TAB_FILTER_GAP = 8
+local FILTER_BUTTON_WIDTH = 72
+local FILTER_TAB_WIDTH = math.floor(
+    (LEFT_COLUMN_WIDTH - FILTER_TAB_LEFT - 2 - FILTER_BUTTON_WIDTH - LIST_TAB_FILTER_GAP
+        - LIST_TAB_GAP * (LIST_TAB_COUNT - 1)) / LIST_TAB_COUNT
+)
 -- Status band lives on the main frame above logPage; tabs still sit on the list edge.
 local LOG_SECTION_TOP = -(TAB_HEIGHT - FILTER_TAB_OVERLAP)
 local SIDE_TAB_HEIGHT = 53
@@ -46,7 +46,6 @@ local SIDE_TAB_WIDTH = 53
 local SIDE_TAB_OVERLAP = 8
 local SIDE_TAB_GAP = 10
 local SIDE_TAB_ICON_SIZE = 36
-local SIDE_TAB_ICON_PAD = 8
 local SIDE_TAB_TOP = -(TAB_TOP_OFFSET - LOG_SECTION_TOP)
 local TAB_BORDER_EDGE = 12
 local FILTER_BORDER_EDGE = 8
@@ -62,7 +61,6 @@ local METAL_EDGE = "Interface\\Tooltips\\UI-Tooltip-Border"
 local GOLD = { 0.90, 0.75, 0.28 }
 local GOLD_DIM = { 0.55, 0.45, 0.22 }
 local FRAME_METAL = { 0.78, 0.72, 0.58 }
-local FRAME_METAL_DIM = { 0.42, 0.38, 0.30 }
 local PANEL_BG = { 0.14, 0.10, 0.06, 1 }
 local LIST_BG = { 0.02, 0.02, 0.02, 1 }
 local WHEEL_STEP = ROW_HEIGHT * 4
@@ -257,7 +255,6 @@ local SPEC_CONTROL_GAP = 2
 local SPEC_LABEL_WIDTH = 130
 local SPEC_CONTROL_WIDTH = SPEC_LABEL_WIDTH + SPEC_CONTROL_GAP + SPEC_ICON_SIZE + SPEC_CONTROL_GAP + SPEC_ARROW_SIZE
 local SPEC_CONTROL_HEIGHT = math.max(SPEC_ICON_SIZE, SPEC_ARROW_SIZE)
-local SPEC_ROW_GAP = 2
 local LOG_FRAME_STRATA = "DIALOG"
 local LOG_FRAME_LEVEL = 100
 
@@ -291,7 +288,6 @@ local function BringLogWindowToFront(frame)
         log:LayoutSideTabs(frame)
     end
 end
-local TAB_GROUP_WIDTH = (88 * 2) + 4
 local DETAIL_TEXT_COLOR = { 0, 0, 0 }
 local LORE_TEXT_COLOR = { 0, 0, 0 }
 -- Same faces as the quest log: QuestTitleFont for the title and
@@ -1396,6 +1392,12 @@ local function StyleGoldTab(btn, selected)
     if btn.gqHover then
         btn.gqHover:SetDrawLayer("OVERLAY", 6)
     end
+    if fs.SetWordWrap then
+        fs:SetWordWrap(false)
+    end
+    if GQ.FitCalmFont then
+        GQ:FitCalmFont(fs, (btn:GetWidth() or FILTER_TAB_WIDTH) - 14, 8)
+    end
     if fs.SetDrawLayer then
         fs:SetDrawLayer("OVERLAY", 7)
     end
@@ -2291,11 +2293,14 @@ local PROFESSION_FILTERS = {
     "Tailoring",
 }
 
--- Dungeons and raids that have a boss-drop hunt, alphabetical.
--- The flyout only lists the ones that have a hunt in the current level
--- window, including ranks below the top 3. A cleared box stays cleared.
+-- Dungeons and raids, alphabetical. The flyout only lists the ones that
+-- have a boss-drop hunt in the current level window, including ranks below
+-- the top 3. A cleared box stays cleared.
 GQ.Log.DUNGEON_FILTERS = {
+    "Ahn'Qiraj",
+    "Alcaz Prison",
     "Blackfathom Deeps",
+    "Blackmaw Hold",
     "Blackrock Depths",
     "Blackrock Spire",
     "Blackwing Lair",
@@ -2304,6 +2309,7 @@ GQ.Log.DUNGEON_FILTERS = {
     "Excavation Site",
     "Gnomeregan",
     "Hall of Thanes",
+    "Krol'dok Stronghold",
     "Maraudon",
     "Molten Core",
     "Naxxramas",
@@ -2317,10 +2323,12 @@ GQ.Log.DUNGEON_FILTERS = {
     "Scarlet Monastery",
     "Scholomance",
     "Shadowfang Keep",
+    "Shaper's Terrace",
     "Stratholme",
     "Sunken Temple",
     "Temple of Ahn'Qiraj",
     "The Deadmines",
+    "The Drowned City",
     "The Stockade",
     "Uldaman",
     "Wailing Caverns",
@@ -3102,6 +3110,53 @@ function GQ.Log:TextNamesInstance(text)
     return false
 end
 
+-- A stored step sends you into an instance when Wowhead Forever marks that
+-- quest as a dungeon quest, or as a raid quest filed in a raid. The direct
+-- reward list is the gear those quests hand out, including a chain that was
+-- not stored. Steps after the reward quest are ignored.
+function GQ.Log:ChainEntersInstance(entry)
+    if not entry then
+        return false
+    end
+    local faction = GQ.GetEffectiveFaction and GQ:GetEffectiveFaction() or ""
+    if entry._gqInstanceFaction == faction and entry._gqInstanceChain ~= nil then
+        return entry._gqInstanceChain
+    end
+    local enters = false
+    local rewards = GQ.Data and GQ.Data.instanceReward
+    if rewards and entry.itemId and rewards[entry.itemId] then
+        enters = true
+    end
+    if not enters and GQ.Data and GQ.Data.QuestChainSteps then
+        local steps = GQ.Data:QuestChainSteps(entry, 1)
+        if steps then
+            local last = #steps
+            local rewardName = entry.questName
+            if type(rewardName) == "string" and rewardName ~= "" then
+                for i = 1, #steps do
+                    local step = steps[i]
+                    if type(step) == "table" and step[2] == rewardName then
+                        last = i
+                    end
+                end
+            end
+            local quests = GQ.Data.instanceQuest
+            for i = 1, last do
+                local step = steps[i]
+                local qid = type(step) == "table" and tonumber(step[1])
+                local name = type(step) == "table" and step[2]
+                if (qid and quests and quests[qid]) or self:TextNamesInstance(name) then
+                    enters = true
+                    break
+                end
+            end
+        end
+    end
+    entry._gqInstanceFaction = faction
+    entry._gqInstanceChain = enters
+    return enters
+end
+
 function GQ.Log:EntryRequiresInstance(entry)
     if not entry then
         return false
@@ -3126,6 +3181,9 @@ function GQ.Log:EntryRequiresInstance(entry)
         return true
     end
     if src == "quest_reward" then
+        if self:ChainEntersInstance(entry) then
+            return true
+        end
         if self:TextNamesInstance(entry.instructions) or self:TextNamesInstance(entry.questName) then
             return true
         end
@@ -5211,7 +5269,25 @@ function GQ.Log:GetSlotListEntries(slotName)
     if tab == "removed" then
         return self:GetRemovedSlotListEntries(slotName)
     end
+    if tab == "tracked" then
+        return self:GetTrackedSlotListEntries(slotName)
+    end
     return self:GetActiveSlotListEntries(slotName)
+end
+
+function GQ.Log:GetTrackedSlotListEntries(slotName)
+    local results = {}
+    if not GQ.Tracker or not GQ.Tracker.GetTrackedEntries then
+        return results
+    end
+    local tracked = GQ.Tracker:GetTrackedEntries() or {}
+    for i = 1, #tracked do
+        local entry = tracked[i]
+        if GQ.Data:EntryMatchesSlot(entry, slotName) then
+            results[#results + 1] = entry
+        end
+    end
+    return results
 end
 
 function GQ.Log:TrackHunt(id)
@@ -5597,7 +5673,7 @@ function GQ.Log:UntrackHunt(id)
 
     CharProgress().hunts[id] = nil
 
-    if self.selectedHuntId == id and (willDisappear or onCompletedTab) then
+    if self.selectedHuntId == id and (willDisappear or onCompletedTab or self:GetListTab() == "tracked") then
         self.selectedHuntId = nil
     self.selectedEntry = nil
         self:ClearDetail()
@@ -7139,6 +7215,7 @@ function GQ.Log:LayoutListTopOpening()
     local which = self.GetListTab and self:GetListTab()
     local tab = which == "completed" and frame.tabCompleted
         or which == "removed" and frame.tabRemoved
+        or which == "tracked" and frame.tabTracked
         or frame.tabActive
     if page ~= "log" or not tab or not tab:IsShown() or not list:IsShown() then
         restore()
@@ -7204,11 +7281,17 @@ function GQ.Log:UpdateTabVisuals()
     if self.frame.tabRemoved then
         StyleGoldTab(self.frame.tabRemoved, tab == "removed")
     end
+    if self.frame.tabTracked then
+        StyleGoldTab(self.frame.tabTracked, tab == "tracked")
+    end
     local listLevel = (self.frame.listInset and self.frame.listInset:GetFrameLevel()) or (self.frame:GetFrameLevel() + 2)
     self.frame.tabActive:SetFrameLevel(tab == "active" and (listLevel + 8) or math.max(1, listLevel - 1))
     self.frame.tabCompleted:SetFrameLevel(tab == "completed" and (listLevel + 8) or math.max(1, listLevel - 1))
     if self.frame.tabRemoved then
         self.frame.tabRemoved:SetFrameLevel(tab == "removed" and (listLevel + 8) or math.max(1, listLevel - 1))
+    end
+    if self.frame.tabTracked then
+        self.frame.tabTracked:SetFrameLevel(tab == "tracked" and (listLevel + 8) or math.max(1, listLevel - 1))
     end
     self:LayoutListTopOpening()
     self:UpdatePageTabVisuals()
@@ -8842,6 +8925,51 @@ function GQ.Log:ApplyPageTab()
     end
 end
 
+function GQ.Log:LayoutListTabs(frame)
+    local tabBar = frame and frame.tabBar
+    if not tabBar then
+        return
+    end
+    local specs = {
+        { "tabActive", "GearQuestLogTabActive", L["Active"], "active" },
+        { "tabCompleted", "GearQuestLogTabCompleted", L["Completed"], "completed" },
+        { "tabRemoved", "GearQuestLogTabRemoved", L["Removed"], "removed" },
+        { "tabTracked", "GearQuestLogTabTracked", L["Tracked"], "tracked" },
+    }
+    tabBar:SetWidth(FILTER_TAB_WIDTH * #specs + LIST_TAB_GAP * (#specs - 1))
+    local current = self:GetListTab()
+    local prev
+    for i = 1, #specs do
+        local key, name, label, tab = specs[i][1], specs[i][2], specs[i][3], specs[i][4]
+        local btn = frame[key]
+        if not btn then
+            btn = CreateGoldTab(tabBar, name, label, FILTER_TAB_WIDTH)
+            btn:SetScript("OnClick", function()
+                local log = _G.GearQuest and _G.GearQuest.Log
+                if log then
+                    log:HideSpecPicker()
+                    log:SetListTab(tab)
+                end
+            end)
+            frame[key] = btn
+        else
+            btn:SetWidth(FILTER_TAB_WIDTH)
+            local fs = btn:GetFontString()
+            if fs then
+                fs:SetText(label)
+            end
+        end
+        btn:ClearAllPoints()
+        if prev then
+            btn:SetPoint("TOPLEFT", prev, "TOPRIGHT", LIST_TAB_GAP, 0)
+        else
+            btn:SetPoint("TOPLEFT", tabBar, "TOPLEFT", 0, 0)
+        end
+        StyleGoldTab(btn, current == tab)
+        prev = btn
+    end
+end
+
 function GQ.Log:EnsureTabBar(frame)
     local pageBar = self:EnsurePageBar(frame)
     self:EnsureLogPages(frame)
@@ -8849,71 +8977,17 @@ function GQ.Log:EnsureTabBar(frame)
     if not frame.tabBar then
         local tabBar = CreateFrame("Frame", nil, pageBar)
         tabBar:SetHeight(TAB_HEIGHT)
-        tabBar:SetWidth(FILTER_TAB_WIDTH * 3 + 8)
         tabBar:SetPoint("TOPLEFT", pageBar, "TOPLEFT", FILTER_TAB_LEFT, 0)
         frame.tabBar = tabBar
         tabBar.tabGroup = tabBar
-
-        local tabActive = CreateGoldTab(tabBar, "GearQuestLogTabActive", L["Active"], FILTER_TAB_WIDTH)
-        tabActive:SetPoint("TOPLEFT", tabBar, "TOPLEFT", 0, 0)
-        frame.tabActive = tabActive
-
-        local tabCompleted = CreateGoldTab(tabBar, "GearQuestLogTabCompleted", L["Completed"], FILTER_TAB_WIDTH)
-        tabCompleted:SetPoint("TOPLEFT", tabActive, "TOPRIGHT", 4, 0)
-        frame.tabCompleted = tabCompleted
-
-        local tabRemoved = CreateGoldTab(tabBar, "GearQuestLogTabRemoved", L["Removed"], FILTER_TAB_WIDTH)
-        tabRemoved:SetPoint("TOPLEFT", tabCompleted, "TOPRIGHT", 4, 0)
-        frame.tabRemoved = tabRemoved
-
-        tabActive:SetScript("OnClick", function()
-            local log = _G.GearQuest and _G.GearQuest.Log
-            if log then
-                log:HideSpecPicker()
-                log:SetListTab("active")
-            end
-        end)
-
-        tabCompleted:SetScript("OnClick", function()
-            local log = _G.GearQuest and _G.GearQuest.Log
-            if log then
-                log:HideSpecPicker()
-                log:SetListTab("completed")
-            end
-        end)
-
-        tabRemoved:SetScript("OnClick", function()
-            local log = _G.GearQuest and _G.GearQuest.Log
-            if log then
-                log:HideSpecPicker()
-                log:SetListTab("removed")
-            end
-        end)
     else
         if frame.tabBar:GetParent() ~= pageBar then
             frame.tabBar:SetParent(pageBar)
         end
         frame.tabBar:ClearAllPoints()
-        frame.tabBar:SetWidth(FILTER_TAB_WIDTH * 3 + 8)
         frame.tabBar:SetPoint("TOPLEFT", pageBar, "TOPLEFT", FILTER_TAB_LEFT, 0)
-        if not frame.tabRemoved and frame.tabCompleted then
-            local tabRemoved = CreateGoldTab(frame.tabBar, "GearQuestLogTabRemoved", L["Removed"], FILTER_TAB_WIDTH)
-            tabRemoved:SetPoint("TOPLEFT", frame.tabCompleted, "TOPRIGHT", 4, 0)
-            tabRemoved:SetScript("OnClick", function()
-                local log = _G.GearQuest and _G.GearQuest.Log
-                if log then
-                    log:HideSpecPicker()
-                    log:SetListTab("removed")
-                end
-            end)
-            frame.tabRemoved = tabRemoved
-        end
-        StyleGoldTab(frame.tabActive, self:GetListTab() == "active")
-        StyleGoldTab(frame.tabCompleted, self:GetListTab() == "completed")
-        if frame.tabRemoved then
-            StyleGoldTab(frame.tabRemoved, self:GetListTab() == "removed")
-        end
     end
+    self:LayoutListTabs(frame)
 
     self:EnsureSourceFilter(frame)
     self:EnsureSimulatorPage(frame)
@@ -11488,7 +11562,7 @@ function GQ.Log:CreateChatSetting(frame, detail, anchor)
     hint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
     hint:SetJustifyH("LEFT")
     hint:SetWordWrap(true)
-    hint:SetText(L["Stops every GearQuest line in chat, including login, obtain notices, and /gq replies. The log stays."])
+    hint:SetText(L["Stops GearQuest lines in chat, including login, obtain notices, and /gq replies. A notice that a newer version is available still shows. The log stays."])
     hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsChatHint = hint
 end
@@ -11603,6 +11677,128 @@ function GQ.Log:CreateMapPinSetting(frame, detail, anchor)
     hint:SetText(L["Hides the icons GearQuest puts on the world map. Show on map and the guide still place the normal map marker."])
     hint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
     frame.settingsMapPinHint = hint
+
+    local sizeLabel = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    sizeLabel:SetJustifyH("LEFT")
+    sizeLabel:SetText(L["Map pin size"])
+    sizeLabel:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsMapPinSizeLabel = sizeLabel
+
+    local sizeHit = CreateFrame("Button", nil, detail)
+    sizeHit:SetPoint("TOPLEFT", hint, "BOTTOMLEFT", 0, -16)
+    sizeHit:SetSize(math.max(sizeLabel:GetStringWidth() or 0, 1) + 4, math.max(sizeLabel:GetStringHeight() or 0, 18))
+    sizeLabel:SetParent(sizeHit)
+    sizeLabel:ClearAllPoints()
+    sizeLabel:SetPoint("LEFT", sizeHit, "LEFT", 0, 0)
+    frame.settingsMapPinSizeHit = sizeHit
+
+    local sizeValue = CreateFontStringWithFallback(detail, QUEST_DETAIL_TITLE_FONTS)
+    sizeValue:SetPoint("LEFT", sizeHit, "RIGHT", 8, 0)
+    sizeValue:SetJustifyH("LEFT")
+    sizeValue:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    frame.settingsMapPinSizeValue = sizeValue
+
+    local function PinPercent()
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        local percent = math.floor((tonumber(settings and settings.mapPinScalePercent) or 100) + 0.5)
+        if percent < 50 then
+            percent = 50
+        elseif percent > 150 then
+            percent = 150
+        end
+        return percent
+    end
+
+    local slider
+    local createdOk, created = pcall(CreateFrame, "Slider", "GearQuestMapPinScaleSlider", detail, "OptionsSliderTemplate")
+    if createdOk and created then
+        slider = created
+    else
+        slider = CreateFrame("Slider", "GearQuestMapPinScaleSlider", detail)
+        slider:SetOrientation("HORIZONTAL")
+        local thumb = slider:CreateTexture(nil, "ARTWORK")
+        thumb:SetTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
+        thumb:SetSize(32, 32)
+        slider:SetThumbTexture(thumb)
+    end
+    slider:SetPoint("TOPLEFT", sizeHit, "BOTTOMLEFT", 0, -6)
+    slider:SetWidth(220)
+    slider:SetHeight(17)
+    slider:SetMinMaxValues(50, 150)
+    slider:SetValueStep(1)
+    if slider.SetObeyStepOnDrag then
+        slider:SetObeyStepOnDrag(true)
+    end
+    local sliderName = slider:GetName()
+    local lowText = slider.Low or (sliderName and _G[sliderName .. "Low"])
+    local highText = slider.High or (sliderName and _G[sliderName .. "High"])
+    local titleText = slider.Text or (sliderName and _G[sliderName .. "Text"])
+    if lowText then
+        lowText:SetText("50%")
+        lowText:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    end
+    if highText then
+        highText:SetText("150%")
+        highText:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    end
+    if titleText then
+        titleText:SetText("")
+        titleText:Hide()
+    end
+    local function ApplyPinPercent(percent)
+        percent = math.floor((tonumber(percent) or 100) + 0.5)
+        if percent < 50 then
+            percent = 50
+        elseif percent > 150 then
+            percent = 150
+        end
+        GearQuestForeverDB.settings = GearQuestForeverDB.settings or {}
+        GearQuestForeverDB.settings.mapPinScalePercent = percent
+        if GQ.Pins and GQ.Pins.Rescale then
+            GQ.Pins:Rescale()
+        end
+    end
+    slider:SetScript("OnValueChanged", function(self, value)
+        local percent = math.floor((tonumber(value) or 100) + 0.5)
+        if percent < 50 then
+            percent = 50
+        elseif percent > 150 then
+            percent = 150
+        end
+        sizeValue:SetText(tostring(percent) .. "%")
+        if self._gqQuiet then
+            return
+        end
+        if IsMouseButtonDown and IsMouseButtonDown("LeftButton") then
+            return
+        end
+        ApplyPinPercent(percent)
+    end)
+    slider:SetScript("OnMouseUp", function(self)
+        if self._gqQuiet then
+            return
+        end
+        ApplyPinPercent(self:GetValue())
+    end)
+    slider._gqQuiet = true
+    slider:SetValue(PinPercent())
+    slider._gqQuiet = nil
+    sizeValue:SetText(tostring(PinPercent()) .. "%")
+    frame.settingsMapPinSizeSlider = slider
+
+    local sizeHint = CreateFontStringWithFallback(detail, {
+        "QuestFontNormalSmall",
+        "SystemFont_Small",
+        "SystemFont_Shadow_Small",
+        "QuestFont",
+    })
+    sizeHint:SetPoint("TOPLEFT", slider, "BOTTOMLEFT", 0, -4)
+    sizeHint:SetPoint("RIGHT", detail, "RIGHT", -16, 0)
+    sizeHint:SetJustifyH("LEFT")
+    sizeHint:SetWordWrap(true)
+    sizeHint:SetText(L["100% is the normal icon. It keeps this size when the map zooms, including OpenMap."])
+    sizeHint:SetTextColor(LORE_TEXT_COLOR[1], LORE_TEXT_COLOR[2], LORE_TEXT_COLOR[3])
+    frame.settingsMapPinSizeHint = sizeHint
 end
 
 
@@ -11721,6 +11917,29 @@ function GQ.Log:EnsureSettingsPage(frame)
     end)
     WireSettingsListHover(credits)
     frame.settingsCreditsBtn = credits
+
+    local donations = CreateFrame("Button", "GearQuestSettingsDonations", list)
+    donations:SetHeight(22)
+    donations:SetPoint("TOPLEFT", credits, "BOTTOMLEFT", 0, -2)
+    donations:SetPoint("TOPRIGHT", credits, "BOTTOMRIGHT", 0, -2)
+    donations.highlight = donations:CreateTexture(nil, "BACKGROUND")
+    donations.highlight:SetAllPoints()
+    donations.highlight:SetColorTexture(0.28, 0.22, 0.08, 0.85)
+    donations.highlight:Hide()
+    donations.text = donations:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    donations.text:SetPoint("LEFT", donations, "LEFT", 8, 0)
+    donations.text:SetPoint("RIGHT", donations, "RIGHT", -8, 0)
+    donations.text:SetJustifyH("LEFT")
+    donations.text:SetText(L["Donations"])
+    donations.text:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+    donations:SetScript("OnClick", function()
+        local log = _G.GearQuest and _G.GearQuest.Log
+        if log then
+            log:SetSettingsSection("donations")
+        end
+    end)
+    WireSettingsListHover(donations)
+    frame.settingsDonationsBtn = donations
 
     local detail = CreateFrame("Frame", nil, page)
     EnableClipping(detail)
@@ -12226,7 +12445,7 @@ function GQ.Log:EnsureSettingsPage(frame)
     frame.settingsEnchantHint = enchantHint
 
     self:CreateMapPinSetting(frame, detail, enchantHint)
-    self:CreateTrackerSetting(frame, detail, frame.settingsMapPinHint or enchantHint)
+    self:CreateTrackerSetting(frame, detail, frame.settingsMapPinSizeHint or frame.settingsMapPinHint or enchantHint)
     if frame.settingsMapPinLabelHit then
         frame.settingsMapPinLabelHit:Hide()
     end
@@ -12235,6 +12454,18 @@ function GQ.Log:EnsureSettingsPage(frame)
     end
     if frame.settingsMapPinHint then
         frame.settingsMapPinHint:Hide()
+    end
+    if frame.settingsMapPinSizeHit then
+        frame.settingsMapPinSizeHit:Hide()
+    end
+    if frame.settingsMapPinSizeValue then
+        frame.settingsMapPinSizeValue:Hide()
+    end
+    if frame.settingsMapPinSizeSlider then
+        frame.settingsMapPinSizeSlider:Hide()
+    end
+    if frame.settingsMapPinSizeHint then
+        frame.settingsMapPinSizeHint:Hide()
     end
     if frame.settingsTrackerLabelHit then
         frame.settingsTrackerLabelHit:Hide()
@@ -12379,6 +12610,89 @@ function GQ.Log:EnsureSettingsPage(frame)
     WireMouseWheel(creditsScroll, creditsScroll)
     WireMouseWheel(creditsChild, creditsScroll)
 
+    local donationUrl = "https://buymeacoffee.com/weber8210"
+    local donationText = "Building GearQuest might be easier than it would have been 5 years ago, but code is expensive and I appreciate any support I can get, and donations enable me to do even more including implementing new cool features that hopefully make your Forever experience smoother :)\n\nAny donations are very much appreciated, thanks!"
+
+    local donationScroll = CreatePanelScrollFrame("GearQuestSettingsDonationsScroll", detail)
+    donationScroll:Hide()
+    frame.settingsDonationsScroll = donationScroll
+    local donationChild = CreateFrame("Frame", nil, donationScroll)
+    donationChild:SetSize(20, 20)
+    donationScroll:SetScrollChild(donationChild)
+    frame.settingsDonationsChild = donationChild
+
+    local donationBody = CreateFontStringWithFallback(donationChild, QUEST_DETAIL_BODY_FONTS)
+    donationBody:SetPoint("TOPLEFT", donationChild, "TOPLEFT", 4, -2)
+    donationBody:SetJustifyH("LEFT")
+    donationBody:SetWordWrap(true)
+    donationBody:SetText(L[donationText])
+    donationBody:SetTextColor(DETAIL_TEXT_COLOR[1], DETAIL_TEXT_COLOR[2], DETAIL_TEXT_COLOR[3])
+    donationBody:Hide()
+    frame.settingsDonationBody = donationBody
+
+    local donationCopy = CreateFrame("Button", "GearQuestDonationCopy", donationChild, "UIPanelButtonTemplate")
+    donationCopy:SetSize(72, 22)
+    donationCopy:SetPoint("TOPRIGHT", donationBody, "BOTTOMRIGHT", 0, -12)
+    donationCopy:SetText(L["Copy"])
+    GQ:FitButton(donationCopy, 72, 140)
+    donationCopy:Hide()
+    frame.settingsDonationCopy = donationCopy
+
+    local donationBox = CreateFrame("EditBox", "GearQuestDonationLink", donationChild, "InputBoxTemplate")
+    donationBox:SetAutoFocus(false)
+    donationBox:SetHeight(22)
+    donationBox:SetPoint("TOPLEFT", donationBody, "BOTTOMLEFT", 8, -12)
+    donationBox:SetPoint("RIGHT", donationCopy, "LEFT", -8, 0)
+    donationBox:SetText(donationUrl)
+    donationBox:SetCursorPosition(0)
+    GQ:CalmFont(donationBox)
+    donationBox:HookScript("OnShow", function(self)
+        GQ:CalmFont(self)
+    end)
+    donationBox:Hide()
+    frame.settingsDonationBox = donationBox
+
+    local function KeepDonationUrl(box)
+        if box._gqLock then
+            return
+        end
+        if box:GetText() ~= donationUrl then
+            box._gqLock = true
+            box:SetText(donationUrl)
+            box._gqLock = false
+        end
+    end
+    donationBox:SetScript("OnEscapePressed", function(self)
+        self:ClearFocus()
+    end)
+    donationBox:SetScript("OnEditFocusGained", function(self)
+        KeepDonationUrl(self)
+        self:HighlightText()
+    end)
+    donationBox:SetScript("OnTextChanged", function(self)
+        KeepDonationUrl(self)
+    end)
+    donationBox:SetScript("OnChar", function(self)
+        KeepDonationUrl(self)
+        self:HighlightText()
+    end)
+    donationCopy:SetScript("OnClick", function(self)
+        donationBox:Show()
+        KeepDonationUrl(donationBox)
+        donationBox:SetFocus()
+        donationBox:HighlightText()
+        self:SetText("Ctrl+C")
+        if C_Timer and C_Timer.After then
+            C_Timer.After(1.6, function()
+                if self:GetText() == "Ctrl+C" then
+                    self:SetText(L["Copy"])
+                end
+            end)
+        end
+    end)
+    WireMouseWheel(donationScroll, donationScroll)
+    WireMouseWheel(donationChild, donationScroll)
+
     local commandScroll = CreatePanelScrollFrame("GearQuestSettingsCommandsScroll", detail)
     commandScroll:Hide()
     frame.settingsCommandsScroll = commandScroll
@@ -12505,6 +12819,8 @@ function GQ.Log:MountSettingsGeneral(frame, detail)
                 target = frame.settingsCommandsScroll or scroll
             elseif self.settingsSection == "credits" then
                 target = frame.settingsCreditsScroll or scroll
+            elseif self.settingsSection == "donations" then
+                target = frame.settingsDonationsScroll or scroll
             elseif self.settingsSection == "hunts" then
                 target = frame.settingsHuntsScroll or scroll
             end
@@ -12532,6 +12848,7 @@ function GQ.Log:MountSettingsHunts(frame, detail)
         frame.settingsGuideLabelHit, frame.settingsGuideCheck, frame.settingsGuideHint,
         frame.settingsEnchantLabelHit, frame.settingsEnchantCheck, frame.settingsEnchantHint,
         frame.settingsMapPinLabelHit, frame.settingsMapPinCheck, frame.settingsMapPinHint,
+        frame.settingsMapPinSizeHit, frame.settingsMapPinSizeValue, frame.settingsMapPinSizeSlider, frame.settingsMapPinSizeHint,
         frame.settingsTrackerLabelHit, frame.settingsTrackerCheck, frame.settingsTrackerHint,
     }
     for i = 1, #widgets do
@@ -12546,7 +12863,7 @@ function GQ.Log:MountSettingsHunts(frame, detail)
     local hints = {
         frame.settingsLowerHint, frame.settingsToastHint, frame.settingsArrowHint,
         frame.settingsGuideHint, frame.settingsEnchantHint, frame.settingsMapPinHint,
-        frame.settingsTrackerHint,
+        frame.settingsMapPinSizeHint, frame.settingsTrackerHint,
     }
     for i = 1, #hints do
         if hints[i] then
@@ -12761,7 +13078,7 @@ function GQ.Log:LayoutSettingsCommands(frame)
 end
 
 function GQ.Log:SetSettingsSection(section)
-    if section ~= "hunts" and section ~= "credits" and section ~= "commands" then
+    if section ~= "hunts" and section ~= "credits" and section ~= "commands" and section ~= "donations" then
         section = "general"
     end
     self.settingsSection = section
@@ -12780,6 +13097,8 @@ function GQ.Log:SetSettingsSection(section)
             titleText = L["GearQuest Commands"]
         elseif section == "credits" then
             titleText = L["The GearQuest Community"]
+        elseif section == "donations" then
+            titleText = L["Donations"]
         end
         pageTitle:ClearAllPoints()
         pageTitle:SetPoint("TOPLEFT", detail, "TOPLEFT", 16, -16)
@@ -12803,6 +13122,7 @@ function GQ.Log:SetSettingsSection(section)
     setHighlight(frame.settingsHuntsBtn, section == "hunts")
     setHighlight(frame.settingsCommandsBtn, section == "commands")
     setHighlight(frame.settingsCreditsBtn, section == "credits")
+    setHighlight(frame.settingsDonationsBtn, section == "donations")
 
     local function setShown(widgets, on)
         for i = 1, #widgets do
@@ -12860,6 +13180,10 @@ function GQ.Log:SetSettingsSection(section)
         frame.settingsMapPinLabelHit,
         frame.settingsMapPinCheck,
         frame.settingsMapPinHint,
+        frame.settingsMapPinSizeHit,
+        frame.settingsMapPinSizeValue,
+        frame.settingsMapPinSizeSlider,
+        frame.settingsMapPinSizeHint,
         frame.settingsTrackerLabelHit,
         frame.settingsTrackerCheck,
         frame.settingsTrackerHint,
@@ -12879,10 +13203,23 @@ function GQ.Log:SetSettingsSection(section)
     if frame.settingsDiscordCopy and showCredits then
         frame.settingsDiscordCopy:SetText(L["Copy"])
     end
+    local showDonations = section == "donations"
+    setShown({
+        frame.settingsDonationBody,
+        frame.settingsDonationBox,
+        frame.settingsDonationCopy,
+    }, showDonations)
+    if frame.settingsDonationBox and not showDonations then
+        frame.settingsDonationBox:ClearFocus()
+    end
+    if frame.settingsDonationCopy and showDonations then
+        frame.settingsDonationCopy:SetText(L["Copy"])
+    end
     self:LayoutSettingsCommands(frame)
     self:LayoutSettingsGeneral(frame)
     self:LayoutSettingsHunts(frame)
     self:LayoutSettingsCredits(frame)
+    self:LayoutSettingsDonations(frame)
 end
 
 function GQ.Log:LayoutSettingsPage(frame)
@@ -12905,6 +13242,7 @@ function GQ.Log:LayoutSettingsPage(frame)
     self:LayoutSettingsGeneral(frame)
     self:LayoutSettingsHunts(frame)
     self:LayoutSettingsCredits(frame)
+    self:LayoutSettingsDonations(frame)
 end
 
 function GQ.Log:LayoutSettingsCredits(frame)
@@ -12987,6 +13325,75 @@ function GQ.Log:LayoutSettingsCredits(frame)
     end
 end
 
+function GQ.Log:LayoutSettingsDonations(frame)
+    local scroll = frame and frame.settingsDonationsScroll
+    local child = frame and frame.settingsDonationsChild
+    local detail = frame and frame.settingsDetail
+    if not scroll or not child or not detail then
+        return
+    end
+
+    scroll:ClearAllPoints()
+    local pageTitle = frame.settingsPageTitle
+    if pageTitle then
+        scroll:SetPoint("TOPLEFT", pageTitle, "BOTTOMLEFT", -2, -8)
+    else
+        scroll:SetPoint("TOPLEFT", detail, "TOPLEFT", 14, -40)
+    end
+    scroll:SetPoint("BOTTOMRIGHT", detail, "BOTTOMRIGHT", -(14 + SCROLLBAR_WIDTH), 12)
+
+    local width = scroll:GetWidth()
+    if not width or width < 40 then
+        width = RIGHT_COLUMN_WIDTH - 56
+    end
+    child:SetWidth(math.max(width, 40))
+    local textWidth = math.max(width - 12, 40)
+    if frame.settingsDonationBody then
+        frame.settingsDonationBody:SetWidth(textWidth)
+    end
+
+    local function lineHeight(fs, fallback)
+        local h = fs and fs.GetStringHeight and fs:GetStringHeight() or 0
+        if not h or h < 1 then
+            return fallback
+        end
+        return h
+    end
+    local height = 8
+    height = height + lineHeight(frame.settingsDonationBody, 96) + 12
+    height = height + 22 + 16
+    child:SetHeight(height)
+    UpdateScrollChildRect(scroll)
+
+    local barName = scroll.GetName and scroll:GetName()
+    local bar = barName and _G[barName .. "ScrollBar"]
+    if self.settingsSection == "donations" then
+        scroll:Show()
+        ApplyScrollBarVisibility(scroll)
+        if bar and bar.SetFrameLevel and scroll.GetFrameLevel then
+            bar:SetFrameLevel(scroll:GetFrameLevel() + 5)
+        end
+    else
+        scroll:Hide()
+        if scroll.SetVerticalScroll then
+            scroll:SetVerticalScroll(0)
+        end
+        if bar then
+            bar:Hide()
+        end
+    end
+
+    if self.settingsSection == "donations" and not frame.settingsDonationsMeasured and C_Timer and C_Timer.After then
+        frame.settingsDonationsMeasured = true
+        C_Timer.After(0, function()
+            local log = _G.GearQuest and _G.GearQuest.Log
+            if log and log.frame then
+                log:LayoutSettingsDonations(log.frame)
+            end
+        end)
+    end
+end
+
 function GQ.Log:RefreshSettings()
     local frame = self.frame
     local check = frame and frame.settingsMinimapCheck
@@ -13057,6 +13464,22 @@ function GQ.Log:RefreshSettings()
     if mapPinCheck then
         local settings = GearQuestForeverDB and GearQuestForeverDB.settings
         mapPinCheck:SetChecked(settings and settings.hideMapPins and true or false)
+    end
+    local mapPinSlider = frame.settingsMapPinSizeSlider
+    if mapPinSlider and not mapPinSlider._gqQuiet then
+        local settings = GearQuestForeverDB and GearQuestForeverDB.settings
+        local percent = math.floor((tonumber(settings and settings.mapPinScalePercent) or 100) + 0.5)
+        if percent < 50 then
+            percent = 50
+        elseif percent > 150 then
+            percent = 150
+        end
+        mapPinSlider._gqQuiet = true
+        mapPinSlider:SetValue(percent)
+        mapPinSlider._gqQuiet = nil
+        if frame.settingsMapPinSizeValue then
+            frame.settingsMapPinSizeValue:SetText(tostring(percent) .. "%")
+        end
     end
     local mapPinLabel = frame.settingsMapPinLabel
     local mapPinHit = frame.settingsMapPinLabelHit
@@ -14661,6 +15084,8 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
             row.text:SetText(L["No completed hunts in this slot."])
         elseif listTab == "removed" then
             row.text:SetText(L["No removed hunts in this slot."])
+        elseif listTab == "tracked" then
+            row.text:SetText(L["No tracked hunts in this slot."])
         else
             row.text:SetText(L["No upgrades for your level yet."])
         end
@@ -14675,6 +15100,8 @@ function GQ.Log:ConfigureRow(row, yOffset, rowType, slotName, entry, label, hand
         row.text:SetPoint("RIGHT", row, "RIGHT", -6, 0)
         if self:GetListTab() == "removed" then
             row.text:SetText(L["No removed hunts."])
+        elseif self:GetListTab() == "tracked" then
+            row.text:SetText(L["No tracked hunts."])
         else
             row.text:SetText(L["No completed hunts yet."])
         end
@@ -15153,6 +15580,16 @@ function GQ.Log:EnsureItemInfoListener()
             GQ.Data:NoteClientItemMissing(itemId)
         end
         log:RefreshLookupRowName(itemId)
+        if success ~= false and itemId and GetInventoryItemLink and log.UpdateGearScoreBar then
+            for slot = 1, 19 do
+                local worn = GetInventoryItemLink("player", slot)
+                local wornId = worn and tonumber(string.match(worn, "item:(%d+)"))
+                if wornId == itemId then
+                    log:UpdateGearScoreBar()
+                    break
+                end
+            end
+        end
         local entry
         if log:GetPageTab() == "lookup" then
             entry = log.lookupEntry
@@ -15511,6 +15948,29 @@ function GQ.Log:HideSlotRankPanel()
     end
 end
 
+function GQ.Log:SlotRankEquipSlots(slotName, weaponList)
+    if weaponList then
+        return { 16, 17 }
+    end
+    if GQ.Data and GQ.Data.GetInventorySlots then
+        return GQ.Data:GetInventorySlots(slotName) or {}
+    end
+    return {}
+end
+
+function GQ.Log:EntryIsEquippedInSlots(entry, invSlots)
+    if not entry or not entry.itemId or not GetInventoryItemLink or not invSlots or not GQ.Data then
+        return false
+    end
+    for i = 1, #invSlots do
+        local link = GetInventoryItemLink("player", invSlots[i])
+        if link and GQ.Data:EntrySuffixMatchesLink(entry, link) then
+            return true
+        end
+    end
+    return false
+end
+
 function GQ.Log:ShowSlotRankTooltip(row)
     if not row or not GQ.Data then
         return
@@ -15551,10 +16011,20 @@ function GQ.Log:ShowSlotRankTooltip(row)
         if not text or text == "" then
             return ""
         end
+        if type(entry.pipelineScore) == "number" then
+            local raw = string.format(" |cffffffff(%.2f)|r", entry.pipelineScore)
+            local head, tail = text:match("^(|c%x+%d+|r)(.*)$")
+            if head then
+                text = head .. raw .. (tail or "")
+            else
+                text = text .. raw
+            end
+        end
         return "  " .. text
     end
 
     local lines = {}
+    local equipSlots = self:SlotRankEquipSlots(slotName, weaponList)
     local function add(text, gap)
         lines[#lines + 1] = { text = text, gap = gap or 0 }
     end
@@ -15571,7 +16041,11 @@ function GQ.Log:ShowSlotRankTooltip(row)
             if weaponList and self.WeaponTrueRank then
                 place = self:WeaponTrueRank(entry) or i
             end
-            add(string.format("|cffffd100#%d|r %s%s|r%s", place, color, name, scoreTrail(entry)))
+            local equipped = ""
+            if self:EntryIsEquippedInSlots(entry, equipSlots) then
+                equipped = "  |cffffd100" .. L["Equipped"] .. "|r"
+            end
+            add(string.format("|cffffd100#%d|r %s%s|r%s%s", place, color, name, equipped, scoreTrail(entry)))
         end
     end
 
@@ -16068,6 +16542,11 @@ function GQ.Log:SelectHunt(id, scrollToSelection, entryOverride)
         targetTab = "removed"
     elseif self:IsEntryObtained(id) then
         targetTab = "completed"
+    elseif self:GetListTab() == "tracked" then
+        local record = GetHuntRecord(id)
+        if record and NormalizeHuntStatus(record.status) == "tracked" then
+            targetTab = "tracked"
+        end
     end
     if self:GetListTab() ~= targetTab then
         GearQuestForeverDB.ui = GearQuestForeverDB.ui or {}
@@ -17312,6 +17791,46 @@ function GQ.Log:Refresh()
         if not anyRemoved then
             table.insert(layoutRows, { type = "empty_all" })
         end
+    elseif tab == "tracked" then
+        local bySlot = {}
+        local tracked = (GQ.Tracker and GQ.Tracker.GetTrackedEntries and GQ.Tracker:GetTrackedEntries()) or {}
+        for i = 1, #tracked do
+            local entry = tracked[i]
+            local slotName = entry.slot and GQ.Data:NormalizeSlotName(entry.slot)
+            if slotName then
+                local list = bySlot[slotName]
+                if not list then
+                    list = {}
+                    bySlot[slotName] = list
+                end
+                list[#list + 1] = entry
+            end
+        end
+        local seen = {}
+        local anyTracked = false
+        local function addSlot(slotName)
+            local list = bySlot[slotName]
+            if not list or #list == 0 or seen[slotName] then
+                return
+            end
+            seen[slotName] = true
+            anyTracked = true
+            table.insert(layoutRows, { type = "header", slotName = slotName })
+            if not self:IsSlotCollapsed(slotName, list) then
+                for _, entry in ipairs(list) do
+                    table.insert(layoutRows, { type = "item", slotName = slotName, entry = entry })
+                end
+            end
+        end
+        for _, slotName in ipairs(slots) do
+            addSlot(slotName)
+        end
+        for slotName in pairs(bySlot) do
+            addSlot(slotName)
+        end
+        if not anyTracked then
+            table.insert(layoutRows, { type = "empty_all" })
+        end
     else
         for _, slotName in ipairs(slots) do
             if slotName == "MainHand" then
@@ -17449,6 +17968,8 @@ function GQ.Log:Refresh()
         elseif tab == "completed" and status ~= "completed" and not self:IsEntryObtained(self.selectedHuntId) then
             clearSelection = true
         elseif tab == "removed" and not self:IsHuntRemoved(entry) then
+            clearSelection = true
+        elseif tab == "tracked" and status ~= "tracked" then
             clearSelection = true
         elseif tab == "active" and (status == "completed" or self:IsHuntRemoved(entry)) then
             clearSelection = true

@@ -320,11 +320,22 @@ for (const [fEn, fEs] of [
         const tEn = fs.readFileSync(fEn, 'utf8');
         const tEs = fs.readFileSync(fEs, 'utf8');
         const byId = {};
-        for (const m of tEn.matchAll(/\[(\d+)\]\s*=\s*"([^"]+)"/g)) byId[m[1]] = m[2];
-        for (const m of tEs.matchAll(/\[(\d+)\]\s*=\s*"([^"]+)"/g)) {
-            if (byId[m[1]]) {
-                registerTranslation(byId[m[1]], m[2]);
-                registerTranslation(byId[m[1]].split(',')[0], m[2].split(',')[0]);
+        const parseEntries = (src) => {
+            const entries = [];
+            for (const m of src.matchAll(/\[(\d+)\]\s*=\s*"([^"]+)"/g)) entries.push([m[1], m[2]]);
+            for (const m of src.matchAll(/\["([^"]+)"\]\s*=\s*(\d+)/g)) entries.push([m[2], m[1]]);
+            return entries;
+        };
+        for (const [id, nameEn] of parseEntries(tEn)) {
+            if (!nameEn.trim()) continue;
+            if (!byId[id]) byId[id] = [];
+            byId[id].push(nameEn);
+        }
+        for (const [id, nameEs] of parseEntries(tEs)) {
+            if (!nameEs.trim() || !byId[id]) continue;
+            for (const nameEn of byId[id]) {
+                registerTranslation(nameEn, nameEs);
+                registerTranslation(nameEn.split(',')[0], nameEs.split(',')[0]);
             }
         }
     }
@@ -420,7 +431,27 @@ const EXTRA_ENTITIES = {
     'the undercity': 'Entrañas',
     '7 of each color power crystal': '7 Cristales de poder de cada color',
     'felwood / azshara': 'Frondavil / Azshara',
-    "tanaris / un'goro": "Tanaris / Cráter de Un'Goro"
+    "tanaris / un'goro": "Tanaris / Cráter de Un'Goro",
+    "gallywix's lockbox": "Arcón de Gallywix",
+    'lion meat': 'Carne de león',
+    'meat smoker': 'Ahumador de carne',
+    'flayed demon skin': 'Piel de demonio desollada',
+    'giant egg': 'Huevo gigante',
+    'long elegant feather': 'Pluma elegante larga',
+    'makeshift helipad': 'Helipuerto improvisado',
+    "jintha'alor altar": "Altar de Jintha'Alor",
+    'dash': 'Carrerilla',
+    'riverglades': 'Claros del Río',
+    'magram village': 'Aldea Magram',
+    'the rustmaul dig site': 'La Excavación Oxidada',
+    'the noxious lair': 'La Guarida Ponzoñosa',
+    'broken pillar': 'Pilar Roto',
+    'abyssal sands': 'Arenas Abisales',
+    'eastmoon ruins': 'Ruinas de Luna del Este',
+    'southmoon ruins': 'Ruinas de Luna del Sur',
+    'the shimmering flats': 'El Desierto de Sal',
+    'crushridge mage': 'Mago Aplastacresta',
+    'find treasure': 'Buscar tesoros'
 };
 
 for (const [k, v] of Object.entries(EXTRA_ENTITIES)) {
@@ -633,14 +664,20 @@ const TRAVEL_EXACT = {
     'for kirith': 'para Kirith el Maldito',
     'until hearth is almost up': 'hasta que tu Piedra de hogar esté casi lista.',
     'to unfriendly with timbermaw hold': 'hasta alcanzar Mal visto con los Fauces de Madera.',
-    'to 2125 / 3000 neutral reputation with argent dawn': 'hasta alcanzar 2125 / 3000 de reputación Neutral con el Alba Argenta.'
+    'to 2125 / 3000 neutral reputation with argent dawn': 'hasta alcanzar 2125 / 3000 de reputación Neutral con el Alba Argenta.',
+    "out the portal to rut'theran village": "saliendo por el portal hacia la Aldea Rut'theran",
+    'to near 54': 'hasta casi el nivel 54.',
+    'near 54': 'hasta casi el nivel 54.'
 };
 
 function translateTravel(text) {
     if (!text) return text;
+    const normalizeSpanish = (s) => s
+        .replace(/\bde el\b/g, 'del')
+        .replace(/\ba el\b/g, 'al');
     let t = text.trim();
     const low = t.toLowerCase();
-    if (TRAVEL_EXACT[low]) return TRAVEL_EXACT[low];
+    if (TRAVEL_EXACT[low]) return normalizeSpanish(TRAVEL_EXACT[low]);
 
     const prefixes = [
         [/^to\s+(.+)$/i, 'hacia'],
@@ -663,18 +700,18 @@ function translateTravel(text) {
             const rawDest = m[1].trim().replace(/[><]/g, '');
             const cleanDest = rawDest.toLowerCase();
             if (TRAVEL_MAP[cleanDest]) {
-                return `${prep} ${TRAVEL_MAP[cleanDest]}`;
+                return normalizeSpanish(`${prep} ${TRAVEL_MAP[cleanDest]}`);
             }
             const entityDest = translateEntity(rawDest);
-            return `${prep} ${entityDest}`;
+            return normalizeSpanish(`${prep} ${entityDest}`);
         }
     }
 
     const clean = low.replace(/[><]/g, '').trim();
     if (TRAVEL_MAP[clean]) {
-        return TRAVEL_MAP[clean];
+        return normalizeSpanish(TRAVEL_MAP[clean]);
     }
-    return translateEntity(t);
+    return normalizeSpanish(translateEntity(t));
 }
 
 // Flatten raw steps with metadata
@@ -1187,7 +1224,11 @@ let updatedGuidesDecoded = Buffer.from(stripped, 'base64').toString('utf8');
 for (const [guideId, slotNum] of Object.entries(slotMap)) {
     const targetStr = `guideID = "${guideId}",`;
     if (updatedGuidesDecoded.includes(targetStr)) {
-        updatedGuidesDecoded = updatedGuidesDecoded.replace(targetStr, `guideID = "${guideId}",\n\tslot = ${slotNum},`);
+        const escapedId = guideId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const hasSlotRx = new RegExp(`guideID = "${escapedId}",\\r?\\n\\tslot = \\d+,`);
+        if (!hasSlotRx.test(updatedGuidesDecoded)) {
+            updatedGuidesDecoded = updatedGuidesDecoded.replace(targetStr, `guideID = "${guideId}",\n\tslot = ${slotNum},`);
+        }
     } else {
         console.warn(`Warning: Could not match guideID ${guideId} in guides.html`);
     }

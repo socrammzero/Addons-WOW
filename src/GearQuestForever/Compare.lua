@@ -435,6 +435,13 @@ local function LeveledStatWeight(statName)
         return weight
     end
     local key = ResolveStatWeightKey(statName)
+    -- Enhancement intellect stays the raw weight. The endurance double put it above strength.
+    if key == "int" then
+        local specId = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+        if specId == "enhancement" then
+            return weight
+        end
+    end
     local mult = key and leveling[key]
     if mult then
         return weight * mult
@@ -877,10 +884,10 @@ local function ScoringRowsFromWeights(weights, dpsWeight, dpsRanged, speedWeight
         end
     end
     if (dpsWeight or 0) > 0 then
-        rows[#rows + 1] = { label = "Melee weapon damage", value = dpsWeight }
+        rows[#rows + 1] = { label = "Melee weapon DPS", value = dpsWeight }
     end
     if (dpsRanged or 0) > 0 then
-        rows[#rows + 1] = { label = "Ranged weapon damage", value = dpsRanged }
+        rows[#rows + 1] = { label = "Ranged weapon DPS", value = dpsRanged }
     end
     table.sort(rows, function(a, b)
         if a.value ~= b.value then
@@ -891,7 +898,7 @@ local function ScoringRowsFromWeights(weights, dpsWeight, dpsRanged, speedWeight
     if (speedWeight or 0) ~= 0 then
         local at = #rows + 1
         for i = 1, #rows do
-            if rows[i].label == "Melee weapon damage" then
+            if rows[i].label == "Melee weapon DPS" then
                 at = i + 1
                 break
             end
@@ -923,7 +930,7 @@ function GQ.Compare:GetEffectiveScoringRows(classFile, specId, playerLevel)
     local weights = {}
     for key, raw in pairs(specRow.weights) do
         local mult = 1
-        if useLeveling and leveling[key] then
+        if useLeveling and leveling[key] and not (specId == "enhancement" and key == "int") then
             mult = leveling[key]
         end
         local value = raw * mult

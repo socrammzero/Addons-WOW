@@ -588,10 +588,18 @@ function HealBot_Action_GetTimeOffline(button)
             end
         end
         if minutes > 0 then
-            timeOffline=timeOffline..minutes.." min ";
+            if minutes == 1 then
+                timeOffline=timeOffline..minutes.." min ";
+            else
+                timeOffline=timeOffline..minutes.." min ";
+            end
         end
         if seconds > 0 then
-            timeOffline=timeOffline..seconds.." s";
+            if seconds == 1 then
+                timeOffline=timeOffline..seconds.." s";
+            else
+                timeOffline=timeOffline..seconds.." s";
+            end
         end
     end
     return timeOffline;

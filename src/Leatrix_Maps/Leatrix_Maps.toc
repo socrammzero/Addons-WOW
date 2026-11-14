@@ -1,13 +1,13 @@
 ## Interface: 16001
 
 ## Title: Leatrix Maps
+## Notes: curseforge.com/wow/addons/leatrix-maps
 ## Title-esES: Leatrix Maps
 ## Title-esMX: Leatrix Maps
-## Notes: curseforge.com/wow/addons/leatrix-maps
 ## Notes-esES: Mejoras y personalización para el mapa del mundo.
 ## Notes-esMX: Mejoras y personalización para el mapa del mundo.
 
-## Version: 1.60.28
+## Version: 1.60.31
 ## Author: Leatrix
 ## SavedVariables: LeaMapsDB
 ## LoadSavedVariablesFirst: true

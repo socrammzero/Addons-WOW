@@ -187,6 +187,7 @@ local localeText = {
         RANK_SOON = "%s soon",
         NO_MATCHING_RECIPES = "No matching unlearned recipes.",
         LEARN_PROFESSION = "Learn a profession to see its recipes.",
+        ENABLE_PROFESSIONS = "Enable Professions",
     },
     frFR = {
         AVAILABLE_HEADER = "Disponible",
@@ -939,6 +940,7 @@ local localeText = {
         RANK_SOON = "%s próximamente",
         NO_MATCHING_RECIPES = "No hay recetas no aprendidas coincidentes.",
         LEARN_PROFESSION = "Aprende una profesión para ver sus recetas.",
+        ENABLE_PROFESSIONS = "Activar profesiones",
     },
     esMX = {
         AVAILABLE_HEADER = "Disponible ahora",
@@ -1126,6 +1128,7 @@ local localeText = {
         RANK_SOON = "%s próximamente",
         NO_MATCHING_RECIPES = "No hay recetas no aprendidas coincidentes.",
         LEARN_PROFESSION = "Aprende una profesión para ver sus recetas.",
+        ENABLE_PROFESSIONS = "Activar profesiones",
     },
     ptBR = {
         },

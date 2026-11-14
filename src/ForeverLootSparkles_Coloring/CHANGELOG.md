@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.1
+
+- New `/flscolor target`: shows in chat what the addon sees on your current interaction target (name, object ID, cursor icon, category), to help with bug reports.
+
+## 2.2.0
+
+- New sparkle category: **Footlockers (lockpicking)**. Waterlogged, Battered, Dented, Scarlet, Rockjaw and Syndicate Footlockers sparkle as you approach them, in rogue yellow by default, with their own color swatch. Like other nodes they turn grey when your lockpicking skill is too low. On by default.
+
 ## 2.1.0
 
 - New languages: Spanish (esES, esMX), Brazilian Portuguese (ptBR), Italian (itIT), Russian (ruRU), Korean (koKR) and Chinese (zhCN, zhTW), on top of English, German and French. The language follows your game client automatically.

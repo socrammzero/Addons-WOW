@@ -3,11 +3,11 @@
 ## Interface: 11509, 16001, 20506, 50504, 120100
 ## Title: Journey
 ## X-ShortTitle: Journey
-## Version: 4.00.06
+## Version: 4.00.07
 ## X-Min-Guide-Version: 4.00.00
-## Notes: Version: 4.00.06
-## Notes-esES: Versión: 4.00.06
-## Notes-esMX: Versión: 4.00.06
+## Notes: Version: 4.00.07
+## Notes-esES: Versión: 4.00.07
+## Notes-esMX: Versión: 4.00.07
 ## DefaultState: enabled
 ## SavedVariables: Journey_Account
 ## SavedVariablesPerCharacter: Journey_Character

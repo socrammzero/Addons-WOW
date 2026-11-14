@@ -21,6 +21,8 @@ local L = {
 	ore = "Ore veins",
 	quest = "Quest objects",
 	corpseLoot = "Corpses with loot",
+	footlocker = 'Footlockers (lockpicking)',
+	FOOTLOCKER_TOOLTIP = 'Sparkles on footlockers that rogues can pick open, e.g. Battered, Dented or Waterlogged Footlockers. They turn grey when your lockpicking skill is too low.',
 	SWATCH_TOOLTIP = "Click to choose a color.",
 	RESET = "Reset colors",
 	SAFE_CAST = "Safe self-cast",
@@ -49,6 +51,8 @@ if locale == "deDE" then
 	L.ore = "Erzvorkommen";
 	L.quest = "Questobjekte";
 	L.corpseLoot = "Leichen mit Beute";
+	L.footlocker = "Schließkisten (Schlossknacken)";
+	L.FOOTLOCKER_TOOLTIP = "Lässt Schließkisten funkeln, die Schurken knacken können, z. B. ramponierte, verbeulte oder durchnässte Schließkisten. Grau, wenn dein Schlossknacken-Wert zu niedrig ist.";
 	L.SWATCH_TOOLTIP = "Klicken, um eine Farbe zu wählen.";
 	L.RESET = "Farben zurücksetzen";
 	L.SAFE_CAST = "Sicheres Selbstzaubern";
@@ -75,6 +79,8 @@ elseif locale == "frFR" then
 	L.ore = "Filons de minerai";
 	L.quest = "Objets de quête";
 	L.corpseLoot = "Cadavres avec butin";
+	L.footlocker = "Coffres (crochetage)";
+	L.FOOTLOCKER_TOOLTIP = "Fait scintiller les coffres que les voleurs peuvent crocheter, par ex. coffres cabossés, bosselés ou détrempés. Gris si votre compétence en crochetage est trop basse.";
 	L.SWATCH_TOOLTIP = "Cliquez pour choisir une couleur.";
 	L.RESET = "Réinitialiser les couleurs";
 	L.SAFE_CAST = "Auto-incantation sûre";
@@ -111,6 +117,7 @@ ns.L = L;
 local HOW = " Uses Blizzard's soft targeting: the nearest object within about 15 yards sparkles, brighter once you can reach it. Needs the game's Enable Interact Key setting and its interact icons on objects; switching this on turns both on, and with them off nothing sparkles.";
 
 local EN = {
+	how = HOW,
 	enabled = "Show quest item sparkles",
 	enabledTip = "Keeps the game's loot sparkle on, even after a graphics preset turns it off. Your outline mode is left as you set it. Switching this off takes effect after restarting the game.",
 	header = "Sparkles while approaching",
@@ -128,6 +135,7 @@ local TRANSLATIONS = {
 	deDE = (function()
 		local how = " Nutzt Blizzards Soft-Targeting: Das nächste Objekt im Umkreis von etwa 15 Metern funkelt, heller, sobald du es erreichen kannst. Benötigt die Spieleinstellung „Interaktionstaste aktivieren“ und deren Interaktionssymbole an Objekten; das Einschalten aktiviert beides, sind sie aus, funkelt nichts.";
 		return {
+			how = how,
 			enabled = "Beutefunkeln an Questgegenständen anzeigen",
 			enabledTip = "Hält das Beutefunkeln des Spiels eingeschaltet, auch wenn eine Grafikvoreinstellung es abschaltet. Dein Umrissmodus bleibt, wie du ihn eingestellt hast. Das Ausschalten wirkt erst nach einem Neustart des Spiels.",
 			header = "Funkeln beim Annähern",
@@ -144,6 +152,7 @@ local TRANSLATIONS = {
 	frFR = (function()
 		local how = " Utilise le ciblage souple de Blizzard : l'objet le plus proche dans un rayon d'environ 15 mètres scintille, plus vivement dès que vous pouvez l'atteindre. Nécessite l'option « Activer la touche d'interaction » du jeu et ses icônes d'interaction sur les objets ; activer cette option active les deux, et sans elles rien ne scintille.";
 		return {
+			how = how,
 			enabled = "Afficher l'éclat sur les objets de quête",
 			enabledTip = "Garde l'éclat de butin du jeu actif, même quand un préréglage graphique le désactive. Votre mode de contour reste tel que vous l'avez réglé. La désactivation ne prend effet qu'après un redémarrage du jeu.",
 			header = "Éclats à l'approche",

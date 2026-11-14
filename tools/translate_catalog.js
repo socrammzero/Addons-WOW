@@ -47,7 +47,9 @@ const ZONE_TRANSLATIONS = {
     'Loch Modan': 'Loch Modan',
     'Teldrassil': 'Teldrassil',
     'Durotar': 'Durotar',
-    'Mulgore': 'Mulgore'
+    'Mulgore': 'Mulgore',
+    'Riverglades': 'Claros del Río',
+    'Felwood / Azshara': 'Frondavil / Azshara'
 };
 
 const TOOLTIP_TRANSLATIONS = {

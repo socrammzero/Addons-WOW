@@ -164,6 +164,9 @@ local function BuildPanel()
 	anchor = CreateSwatch("ore", anchor, 0, -16);
 	anchor = CreateSwatch("quest", anchor, 0, -16);
 	anchor = CreateSwatch("corpseLoot", anchor, 0, -16);
+	if ns.modern then
+		anchor = CreateSwatch("footlocker", anchor, 0, -16);
+	end
 
 	local reset = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate");
 	reset:SetSize(180, 24);
@@ -237,6 +240,7 @@ local function BuildPanel()
 		AddBox(T.ore, T.oreTip, Bool("sparkleOre", Sparkle));
 		AddBox(T.quest, T.questTip, Bool("sparkleQuest", Sparkle));
 		AddBox(T.corpse, T.corpseTip, Bool("sparkleCorpseLoot", Sparkle));
+		AddBox(L.footlocker, L.FOOTLOCKER_TOOLTIP .. T.how, Bool("sparkleFootlocker", Sparkle));
 		AddBox(L.SAFE_CAST, L.SAFE_CAST_TOOLTIP, Bool("safeSelfCast", function() ns.SafeSelfCastChanged(); end));
 		AddBox(L.HIDE_PLATE, L.HIDE_PLATE_TOOLTIP, Bool("hidePlate", function() ns.HidePlateChanged(); end));
 	end
@@ -288,6 +292,7 @@ local SWATCH_FOR_VARIABLE = {
 	FOREVER_LOOT_SPARKLES_COLORING_ORE = "ore",
 	FOREVER_LOOT_SPARKLES_COLORING_QUEST = "quest",
 	FOREVER_LOOT_SPARKLES_COLORING_CORPSE_LOOT = "corpseLoot",
+	FOREVER_LOOT_SPARKLES_COLORING_FOOTLOCKER = "footlocker",
 	FOREVER_LOOT_SPARKLES_HERBS = "herb",
 	FOREVER_LOOT_SPARKLES_ORE = "ore",
 	FOREVER_LOOT_SPARKLES_QUEST = "quest",
@@ -460,6 +465,7 @@ local function RegisterInline()
 		AddSparkleBox("FOREVER_LOOT_SPARKLES_COLORING_ORE", "sparkleOre", T.ore, T.oreTip, OnSparkleChanged, D.sparkleOre);
 		AddSparkleBox("FOREVER_LOOT_SPARKLES_COLORING_QUEST", "sparkleQuest", T.quest, T.questTip, OnSparkleChanged, D.sparkleQuest);
 		AddSparkleBox("FOREVER_LOOT_SPARKLES_COLORING_CORPSE_LOOT", "sparkleCorpseLoot", T.corpse, T.corpseTip, OnSparkleChanged, D.sparkleCorpseLoot);
+		AddSparkleBox("FOREVER_LOOT_SPARKLES_COLORING_FOOTLOCKER", "sparkleFootlocker", L.footlocker, L.FOOTLOCKER_TOOLTIP .. T.how, OnSparkleChanged, D.sparkleFootlocker);
 		AddSparkleBox("FOREVER_LOOT_SPARKLES_COLORING_SAFE_CAST", "safeSelfCast", L.SAFE_CAST, L.SAFE_CAST_TOOLTIP,
 			function() ns.SafeSelfCastChanged(); end, true);
 		AddSparkleBox("FOREVER_LOOT_SPARKLES_COLORING_HIDE_PLATE", "hidePlate", L.HIDE_PLATE, L.HIDE_PLATE_TOOLTIP,
@@ -514,6 +520,10 @@ end
 
 SLASH_FLSCOLOR1 = "/flscolor";
 SlashCmdList.FLSCOLOR = function(message)
+	if type(message) == "string" and message:lower():find("target", 1, true) and ns.DebugTarget then
+		ns.DebugTarget();
+		return;
+	end
 	if type(message) == "string" and message:lower():find("icon", 1, true) then
 		ns.DebugIcons();
 		return;

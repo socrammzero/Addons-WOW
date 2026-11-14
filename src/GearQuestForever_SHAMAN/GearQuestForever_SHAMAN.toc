@@ -1,12 +1,12 @@
 ## Interface: 16001
 ## Title: GearQuest Forever: Shaman
+## Notes: Hunt lists for this class. GearQuest Forever loads this when you play or simulate it.
 ## Title-esES: GearQuest Forever: Chamán
 ## Title-esMX: GearQuest Forever: Chamán
-## Notes: Hunt lists for this class. GearQuest Forever loads this when you play or simulate it.
 ## Notes-esES: Listas de equipo para esta clase. GearQuest Forever lo carga automáticamente cuando juegas o simulas con ella.
 ## Notes-esMX: Listas de equipo para esta clase. GearQuest Forever lo carga automáticamente cuando juegas o simulas con ella.
 ## Author: Henrik8210
-## Version: 1.1.3
+## Version: 1.1.6
 ## IconTexture: Interface\Icons\ClassIcon_Shaman
 ## LoadOnDemand: 1
 ## Dependencies: GearQuestForever

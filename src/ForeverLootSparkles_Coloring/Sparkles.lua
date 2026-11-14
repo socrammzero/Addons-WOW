@@ -30,12 +30,24 @@ local CATEGORY_OPTIONS = {
 	herb = "sparkleHerbs",
 	quest = "sparkleQuest",
 	corpseLoot = "sparkleCorpseLoot",
+	footlocker = "sparkleFootlocker",
 };
 local DEFAULTS = {
 	sparkleOre = true,
 	sparkleHerbs = true,
 	sparkleQuest = false,
 	sparkleCorpseLoot = true,
+	sparkleFootlocker = true,
+};
+
+-- Footlockers rogues can pick open, by game object ID (from the GUID). The
+-- English name is a fallback for IDs not listed here.
+local FOOTLOCKER_IDS = {
+	[179486] = true, [179487] = true, [179488] = true, [179490] = true, -- Waterlogged, Battered
+	[179496] = true, -- Dented
+	[179498] = true, -- Scarlet
+	[405633] = true, -- Rockjaw
+	[656157] = true, -- Syndicate
 };
 
 local RANGE = 60;          -- soft target range in yards, asked as high as Lueur tried; Forever still drops the target past ~15
@@ -468,6 +480,26 @@ local function ReadState(unit, blocked)
 	return "ready";
 end
 
+-- Game object ID from a GUID like "GameObject-0-1-2-3-179488-0000"
+local function ObjectID(unit)
+	local guid = SafeCall(UnitGUID, unit);
+	if type(guid) ~= "string" then
+		return nil;
+	end
+	local kind, _, _, _, _, id = strsplit("-", guid);
+	if kind == "GameObject" then
+		return tonumber(id);
+	end
+end
+
+local function IsFootlocker(unit, name)
+	local id = ObjectID(unit);
+	if id and FOOTLOCKER_IDS[id] then
+		return true;
+	end
+	return type(name) == "string" and not IsSecret(name) and name:lower():find("footlocker", 1, true) ~= nil;
+end
+
 ---------------------------------------------------------------------------
 -- Target
 ---------------------------------------------------------------------------
@@ -706,7 +738,11 @@ function Evaluate()
 	-- world objects sparkle, and of the units only corpses with loot left
 	local category, blocked;
 	if SafeCall(UnitIsGameObject, unit) == true then
-		category, blocked = Classify(unit, SafeCall(UnitName, unit));
+		local name = SafeCall(UnitName, unit);
+		category, blocked = Classify(unit, name);
+		if IsFootlocker(unit, name) then
+			category = "footlocker"; -- "blocked" from the lockpicking cursor: grey when the skill is too low
+		end
 	elseif db.sparkleCorpseLoot and IsCorpseWithLoot(unit) then
 		category, blocked = "corpseLoot", false;
 	else
@@ -866,6 +902,41 @@ events:SetScript("OnEvent", function(_, event, ...)
 end);
 for event in pairs(handlers) do
 	pcall(events.RegisterEvent, events, event);
+end
+
+---------------------------------------------------------------------------
+-- /flscolor target: what the addon sees on the current interaction target
+---------------------------------------------------------------------------
+
+function ns.DebugTarget()
+	local function out(...)
+		local parts = {};
+		for i = 1, select("#", ...) do
+			parts[#parts + 1] = tostring((select(i, ...)));
+		end
+		print("  " .. table.concat(parts, " "));
+	end
+	print("|cffffd200Forever Loot Sparkles - Herbs & Ores:|r interaction target");
+	out("ready=", ready, "active=", db and IsActive(), "paused=", paused, "gate=", gateOpen);
+	out("cvars: Interact=", GetCVarValue("SoftTargetInteract"), "IconGameObject=", GetCVarValue("SoftTargetIconGameObject"),
+		"NameplateInteract=", GetCVarValue("SoftTargetNameplateInteract"), "Range=", GetCVarValue("SoftTargetInteractRange"));
+	local unit, plate, unknown = ResolveTarget();
+	out("unit=", unit, "plate=", plate ~= nil, "unknown=", unknown);
+	local u = unit or SOFT;
+	local name = SafeCall(UnitName, u);
+	local guid = SafeCall(UnitGUID, u);
+	out("name=", name, "guid=", guid, "objectID=", ObjectID(u));
+	out("gameObject=", SafeCall(UnitIsGameObject, u), "exists=", SafeCall(UnitExists, u), "dead=", SafeCall(UnitIsDead, u));
+	local texture, atlas;
+	if SafeCall(SetUnitCursorTexture, probe, u, nil, true) then
+		texture = probe:GetTexture();
+		atlas = probe.GetAtlas and probe:GetAtlas();
+	end
+	out("cursor texture=", texture, "atlas=", atlas);
+	local category, blocked = Classify(u, name);
+	out("classified=", category, "blocked=", blocked, "footlocker=", IsFootlocker(u, name),
+		"option=", db and db.sparkleFootlocker);
+	out("sparkle shown=", sparkle.frame and sparkle.frame:IsShown(), "category=", sparkle.category);
 end
 
 ---------------------------------------------------------------------------
