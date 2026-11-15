@@ -239,3 +239,10 @@ L["Library books of WoW Forever"] = "Libros de la biblioteca de WoW Forever"
 L["Track the necklace (10), the ring (20) and the bow, crest or light (25)."] = "Sigue el collar (10), el anillo (20) y el arco, blasón o luz (25)."
 L["A Luddite's Guide to Caring for Your Demonic Pet"] = "Guía del ludita para cuidar de tu mascota demoníaca"
 L["Fallow Sanctuary, Swamp of Sorrows"] = "Retiro Fangoso, Pantano de las Penas"
+
+-- world map button
+L["Left Click"] = "Clic izquierdo"
+L["Right Click"] = "Clic derecho"
+L["Show the books"] = "Mostrar los libros"
+L["Hide the books"] = "Ocultar los libros"
+L["Open book list"] = "Abrir la lista de libros"
