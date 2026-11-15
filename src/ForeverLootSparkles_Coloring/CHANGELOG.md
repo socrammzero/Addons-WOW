@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.2
+
+- Fixed: soft targeting pause state was not reset when sparkles or safe self-cast were toggled (see BUGFIX.md).
+
 ## 2.2.1
 
 - New `/flscolor target`: shows in chat what the addon sees on your current interaction target (name, object ID, cursor icon, category), to help with bug reports.

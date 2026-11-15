@@ -10,7 +10,7 @@
 ## Notes-deDE: Bringt das Funkeln an Kräutern, Erzvorkommen, Questobjekten und Leichen mit Beute zurück, das Forever Loot Sparkles 2.0 entfernt hat, sicher fürs Selbstzaubern und mit einer Farbe je Kategorie. Kann Interaktionssymbole ausblenden und übersetzt Forever Loot Sparkles ins Deutsche und Französische.
 ## Notes-frFR: Rétablit les éclats sur les herbes, filons, objets de quête et cadavres avec butin retirés par Forever Loot Sparkles 2.0, sans gêner l'auto-incantation, avec une couleur par catégorie. Peut masquer les icônes d'interaction et traduit Forever Loot Sparkles en allemand et en français.
 ## Author: Sven
-## Version: 2.2.1
+## Version: 2.2.2
 ## Dependencies: ForeverLootSparkles
 ## SavedVariables: ForeverLootSparklesColoringDB
 ## IconTexture: Interface\AddOns\ForeverLootSparkles\Icon

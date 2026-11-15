@@ -98,6 +98,7 @@ local ready = false;         -- cvars are left alone until Forever Loot Sparkles
 local gateOpen;             -- is the game's own target nameplate on? nil = apply again
 local pendingCVars = false; -- "apply" or "restore" once combat ends
 local pendingForce = false; -- the pending "apply" also switches the interact key on
+local paused;               -- nil, "unit" or "combat"; declared here because ApplyCVars/RestoreCVars reset it
 local directWorks = false;  -- GetNamePlateForUnit("softinteract") has worked for an object
 local activeUnits = {};     -- nameplateN token -> true
 local cursorLookup = {};    -- fileID -> { category, greyed out }
@@ -246,7 +247,6 @@ end
 -- it off.
 local RESUME_DISTANCE = 5; -- yards
 local RESUME_TIME = 3;     -- seconds, without a position
-local paused;              -- nil, "unit" or "combat"
 local pausedAt, pausedY, pausedX;
 
 local function PlayerPosition()
