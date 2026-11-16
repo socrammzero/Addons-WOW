@@ -45,34 +45,60 @@ function isJourneyGuidePath(relPosixPath) {
 }
 
 /**
+ * Verifica que una ruta relativa pertenezca estrictamente al directorio base indicado.
+ * @param {string} baseDir
+ * @param {string} relPathInput
+ * @param {string} boundaryLabel
+ * @returns {{ absPath: string, relPath: string }}
+ */
+function assertInsideDir(baseDir, relPathInput, boundaryLabel) {
+  if (typeof relPathInput !== 'string' || !relPathInput.trim()) {
+    throw new Error('Ruta de archivo vacía.');
+  }
+  if (relPathInput.includes('\0') || path.isAbsolute(relPathInput)) {
+    throw new Error(`Ruta no permitida: debe ser una ruta relativa dentro de ${boundaryLabel}.`);
+  }
+  const resolvedRoot = path.resolve(baseDir);
+  const resolvedTarget = path.resolve(resolvedRoot, relPathInput);
+  if (
+    resolvedTarget !== resolvedRoot &&
+    !resolvedTarget.startsWith(resolvedRoot + path.sep)
+  ) {
+    throw new Error(`Ruta no permitida: acceso fuera del directorio ${boundaryLabel}.`);
+  }
+  return {
+    absPath: resolvedTarget,
+    relPath: toPosix(path.relative(resolvedRoot, resolvedTarget)),
+  };
+}
+
+/**
  * Resuelve y valida que una ruta relativa pertenezca estrictamente a src/ y tenga extensión editable.
  * @param {string} srcRoot
  * @param {string} relPathInput
  * @returns {{ absPath: string, relPath: string, ext: string }}
  */
 function resolveSrcFile(srcRoot, relPathInput) {
-  if (typeof relPathInput !== 'string' || !relPathInput.trim()) {
-    throw new Error('Ruta de archivo vacía.');
-  }
-  if (relPathInput.includes('\0') || path.isAbsolute(relPathInput)) {
-    throw new Error('Ruta no permitida: debe ser una ruta relativa dentro de src/.');
-  }
-  const resolvedRoot = path.resolve(srcRoot);
-  const resolvedTarget = path.resolve(resolvedRoot, relPathInput);
-  if (
-    resolvedTarget !== resolvedRoot &&
-    !resolvedTarget.startsWith(resolvedRoot + path.sep)
-  ) {
-    throw new Error('Ruta no permitida: acceso fuera del directorio src/.');
-  }
-
-  const ext = path.extname(resolvedTarget).toLowerCase();
+  const { absPath, relPath } = assertInsideDir(srcRoot, relPathInput, 'src/');
+  const ext = path.extname(absPath).toLowerCase();
   if (!EDITABLE_EXTENSIONS.has(ext)) {
     throw new Error(`Extensión de archivo no editable: ${ext || '(sin extensión)'}`);
   }
+  return { absPath, relPath, ext };
+}
 
-  const relPath = toPosix(path.relative(resolvedRoot, resolvedTarget));
-  return { absPath: resolvedTarget, relPath, ext };
+/**
+ * Resuelve y valida una ruta dentro de la raíz del repositorio (prohibiendo .git/).
+ * @param {string} projectRoot
+ * @param {string} relPathInput
+ * @returns {{ absPath: string, relPath: string }}
+ */
+function resolveRepoPath(projectRoot, relPathInput) {
+  const { absPath, relPath } = assertInsideDir(projectRoot, relPathInput, 'el repositorio');
+  if (!relPath || relPath === '.git' || relPath.startsWith('.git/')) {
+    throw new Error('Ruta no permitida dentro del repositorio.');
+  }
+  return { absPath, relPath };
 }
 
 /**
@@ -653,27 +679,176 @@ function validateProjectIntegrity(projectRoot) {
 }
 
 /**
- * Obtiene el estado resumido de Git para archivos dentro de src/.
+ * Obtiene el estado completo de Git en el repositorio (rama, commits pendientes de push y archivos modificados).
  * @param {string} projectRoot
  */
-function getGitSrcStatus(projectRoot) {
+function getGitRepoStatus(projectRoot) {
   try {
-    const out = execFileSync('git', ['status', '--porcelain', '--', 'src'], {
+    const out = execFileSync('git', ['status', '--porcelain=v1', '-b', '-z', '-u'], {
       cwd: projectRoot,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
     });
-    const modified = out
-      .split(/\r?\n/)
-      .filter(Boolean)
-      .map((line) => ({
-        status: line.slice(0, 2).trim(),
-        path: toPosix(line.slice(3).trim().replace(/^src\//, '')),
-      }));
-    return { available: true, modified };
+    const tokens = out.split('\0').filter((t) => t.length > 0);
+    let branch = '';
+    let upstream = '';
+    let ahead = 0;
+    let behind = 0;
+    const modified = [];
+
+    for (let i = 0; i < tokens.length; i++) {
+      const tok = tokens[i];
+      if (tok.startsWith('## ')) {
+        const header = tok.slice(3);
+        const [branchPart, aheadBehindPart] = header.split(' [');
+        const [localBr, remoteBr] = branchPart.split('...');
+        branch = (localBr || '').trim();
+        upstream = (remoteBr || '').trim();
+        if (aheadBehindPart) {
+          const mAhead = aheadBehindPart.match(/ahead (\d+)/);
+          const mBehind = aheadBehindPart.match(/behind (\d+)/);
+          if (mAhead) ahead = Number(mAhead[1]);
+          if (mBehind) behind = Number(mBehind[1]);
+        }
+        continue;
+      }
+
+      const xy = tok.slice(0, 2);
+      const rawPath = toPosix(tok.slice(3));
+      if (xy.includes('R') || xy.includes('C')) {
+        i++; // saltar ruta origen en renombrado/copia con -z
+      }
+      const inSrc = rawPath.startsWith('src/');
+      modified.push({
+        status: xy.trim() || 'M',
+        path: rawPath,
+        inSrc,
+        srcPath: inSrc ? rawPath.slice(4) : null,
+      });
+    }
+
+    return { available: true, branch, upstream, ahead, behind, modified };
   } catch {
-    return { available: false, modified: [] };
+    return { available: false, branch: '', upstream: '', ahead: 0, behind: 0, modified: [] };
   }
+}
+
+/**
+ * Obtiene el estado resumido de Git limitado a src/ (compatibilidad).
+ * @param {string} projectRoot
+ */
+function getGitSrcStatus(projectRoot) {
+  const full = getGitRepoStatus(projectRoot);
+  return {
+    ...full,
+    modified: full.modified
+      .filter((m) => m.inSrc)
+      .map((m) => ({ ...m, path: m.srcPath })),
+  };
+}
+
+/**
+ * Hace stage y commit únicamente sobre los archivos validados del repositorio.
+ * @param {string} projectRoot
+ * @param {{ message: string, files: string[] }} params
+ */
+function gitCommitChanges(projectRoot, params) {
+  const message = typeof params.message === 'string' ? params.message.trim() : '';
+  if (!message || message.includes('\0')) {
+    throw new Error('El mensaje de commit no puede estar vacío.');
+  }
+  if (message.length > 500) {
+    throw new Error('El mensaje de commit es demasiado largo (máx. 500 caracteres).');
+  }
+  if (!Array.isArray(params.files) || params.files.length === 0) {
+    throw new Error('Seleccione al menos un archivo para incluir en el commit.');
+  }
+
+  const safePaths = [];
+  for (const rawFile of params.files) {
+    const { relPath } = resolveRepoPath(projectRoot, rawFile);
+    safePaths.push(relPath);
+  }
+
+  const cachedOut = execFileSync('git', ['diff', '--cached', '--name-status', '-z'], {
+    cwd: projectRoot,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const cachedTokens = cachedOut.split('\0').filter((t) => t.length > 0);
+  const stagedDeleted = new Set();
+  for (let i = 0; i < cachedTokens.length; i += 2) {
+    const st = cachedTokens[i];
+    const p = cachedTokens[i + 1];
+    if (st === 'D' && p) stagedDeleted.add(toPosix(p));
+  }
+
+  const pathsToAdd = safePaths.filter((p) => !stagedDeleted.has(p));
+  if (pathsToAdd.length > 0) {
+    execFileSync('git', ['add', '-A', '--', ...pathsToAdd], {
+      cwd: projectRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+  }
+
+  const commitOut = execFileSync('git', ['commit', '-m', message, '--', ...safePaths], {
+    cwd: projectRoot,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+
+  return {
+    ok: true,
+    output: commitOut.trim(),
+    git: getGitRepoStatus(projectRoot),
+  };
+}
+
+/**
+ * Ejecuta git push hacia el remoto configurado sin bloqueo interactivo de terminal.
+ * @param {string} projectRoot
+ * @returns {Promise<{ ok: boolean, code: number, output: string, git: object }>}
+ */
+function gitPushChanges(projectRoot) {
+  return new Promise((resolve) => {
+    const child = spawn('git', ['push'], {
+      cwd: projectRoot,
+      windowsHide: true,
+      env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
+    });
+    let out = '';
+    const timer = setTimeout(() => {
+      child.kill();
+      resolve({
+        ok: false,
+        code: 1,
+        output: out + '\nTiempo de espera agotado al ejecutar git push.',
+        git: getGitRepoStatus(projectRoot),
+      });
+    }, 30000);
+
+    child.stdout.on('data', (d) => (out += d.toString('utf8')));
+    child.stderr.on('data', (d) => (out += d.toString('utf8')));
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      resolve({
+        ok: code === 0,
+        code: code ?? 1,
+        output: out.trim() || (code === 0 ? 'Push completado correctamente.' : 'Error al ejecutar git push.'),
+        git: getGitRepoStatus(projectRoot),
+      });
+    });
+    child.on('error', (err) => {
+      clearTimeout(timer);
+      resolve({
+        ok: false,
+        code: 1,
+        output: err.message,
+        git: getGitRepoStatus(projectRoot),
+      });
+    });
+  });
 }
 
 /**
@@ -687,6 +862,7 @@ function revertSrcFileFromGit(projectRoot, relPathInput) {
   execFileSync('git', ['checkout', '--', `src/${relPath}`], {
     cwd: projectRoot,
     encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
   });
   return { ok: true, relPath };
 }
@@ -750,7 +926,10 @@ module.exports = {
   previewReplaceInRoot,
   applyReplaceInRoot,
   validateProjectIntegrity,
+  getGitRepoStatus,
   getGitSrcStatus,
+  gitCommitChanges,
+  gitPushChanges,
   revertSrcFileFromGit,
   runSyncToGame,
 };

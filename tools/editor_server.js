@@ -101,7 +101,7 @@ function createEditorServer(options = {}) {
 
       if (req.method === 'GET' && pathname === '/api/info') {
         const cfg = lib.readProjectConfig(projectRoot);
-        const git = lib.getGitSrcStatus(projectRoot);
+        const git = lib.getGitRepoStatus(projectRoot);
         sendJson(res, 200, {
           ok: true,
           wowAddonsPath: cfg.wowAddonsPath,
@@ -158,7 +158,7 @@ function createEditorServer(options = {}) {
           sendJson(res, 400, result);
           return;
         }
-        sendJson(res, 200, { ok: true, relPath: result.relPath, git: lib.getGitSrcStatus(projectRoot) });
+        sendJson(res, 200, { ok: true, relPath: result.relPath, git: lib.getGitRepoStatus(projectRoot) });
         return;
       }
 
@@ -170,7 +170,7 @@ function createEditorServer(options = {}) {
           ok: true,
           relPath: result.relPath,
           content: fileData.content,
-          git: lib.getGitSrcStatus(projectRoot),
+          git: lib.getGitRepoStatus(projectRoot),
         });
         return;
       }
@@ -197,7 +197,35 @@ function createEditorServer(options = {}) {
           sendJson(res, 400, result);
           return;
         }
-        sendJson(res, 200, { ...result, git: lib.getGitSrcStatus(projectRoot) });
+        sendJson(res, 200, { ...result, git: lib.getGitRepoStatus(projectRoot) });
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/git/status') {
+        sendJson(res, 200, { ok: true, git: lib.getGitRepoStatus(projectRoot) });
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/git/commit') {
+        const body = await readJsonBody(req);
+        const commitRes = lib.gitCommitChanges(projectRoot, body);
+        if (body.push) {
+          const pushRes = await lib.gitPushChanges(projectRoot);
+          sendJson(res, pushRes.ok ? 200 : 500, {
+            ok: pushRes.ok,
+            commitOutput: commitRes.output,
+            output: `${commitRes.output}\n\n${pushRes.output}`.trim(),
+            git: pushRes.git,
+          });
+          return;
+        }
+        sendJson(res, 200, commitRes);
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/git/push') {
+        const pushRes = await lib.gitPushChanges(projectRoot);
+        sendJson(res, pushRes.ok ? 200 : 500, pushRes);
         return;
       }
 
@@ -222,7 +250,7 @@ function createEditorServer(options = {}) {
 
       sendJson(res, 404, { ok: false, error: 'Endpoint no encontrado.' });
     } catch (err) {
-      const status = /no permitida|inválido|vací|extensión|no válido|no existe/i.test(err.message) ? 400 : 500;
+      const status = /no permitida|inválido|vací|extensión|no válido|no existe|seleccione|demasiado largo/i.test(err.message) ? 400 : 500;
       sendJson(res, status, { ok: false, error: err.message || 'Error interno del servidor.' });
     }
   });

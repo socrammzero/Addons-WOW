@@ -5,6 +5,7 @@ const state = {
   wowAddonsPath: '',
   files: [],
   gitModified: [],
+  gitInfo: { available: false, branch: '', upstream: '', ahead: 0, behind: 0, modified: [] },
   scope: 'all',
   addon: 'ALL',
   mode: 'search',
@@ -112,10 +113,18 @@ function closeModal() {
 }
 
 function updateGitBadge(git) {
-  state.gitModified = git && Array.isArray(git.modified) ? git.modified : [];
-  els.gitCountBadge.textContent = String(state.gitModified.length);
-  els.gitCountBadge.classList.toggle('dirty', state.gitModified.length > 0);
+  state.gitInfo = git || { available: false, branch: '', upstream: '', ahead: 0, behind: 0, modified: [] };
+  state.gitModified = Array.isArray(state.gitInfo.modified) ? state.gitInfo.modified : [];
+  const count = state.gitModified.length;
+  const ahead = state.gitInfo.ahead || 0;
+  els.gitCountBadge.textContent = ahead > 0 ? `${count} · ↑${ahead}` : String(count);
+  els.gitCountBadge.classList.toggle('dirty', count > 0 || ahead > 0);
   refreshRevertButton();
+}
+
+function isActiveFileDirtyInGit() {
+  if (!state.activeFile) return false;
+  return state.gitModified.some((m) => (m.inSrc ? m.srcPath === state.activeFile.relPath : m.path === `src/${state.activeFile.relPath}`));
 }
 
 function refreshRevertButton() {
@@ -123,8 +132,7 @@ function refreshRevertButton() {
     els.btnRevertFile.disabled = true;
     return;
   }
-  const isDirtyInGit = state.gitModified.some((m) => m.path === state.activeFile.relPath);
-  els.btnRevertFile.disabled = !isDirtyInGit && !state.dirty;
+  els.btnRevertFile.disabled = !isActiveFileDirtyInGit() && !state.dirty;
 }
 
 function formatGuideCaption(file) {
@@ -277,7 +285,7 @@ async function revertCurrentFile() {
   if (state.dirty) {
     if (!window.confirm('¿Descartar los cambios sin guardar y volver al contenido en disco/Git?')) return;
   }
-  const isDirtyInGit = state.gitModified.some((m) => m.path === state.activeFile.relPath);
+  const isDirtyInGit = isActiveFileDirtyInGit();
   if (!isDirtyInGit) {
     els.codeEditor.value = state.originalContent;
     setDirty(false);
@@ -654,38 +662,263 @@ async function runGlobalValidation() {
   }
 }
 
-function showGitModal() {
-  openModal(
-    `Archivos modificados en src/ (${state.gitModified.length})`,
-    (body) => {
-      if (state.gitModified.length === 0) {
-        const p = document.createElement('p');
-        p.textContent = 'No hay cambios pendientes respecto al último commit de Git.';
-        body.appendChild(p);
-        return;
-      }
-      for (const item of state.gitModified) {
-        const row = document.createElement('div');
-        row.className = 'diff-line';
-        row.style.display = 'flex';
-        row.style.justifyContent = 'space-between';
-        row.style.alignItems = 'center';
-        const label = document.createElement('span');
-        label.textContent = `[${item.status}] ${item.path}`;
-        const openBtn = document.createElement('button');
-        openBtn.type = 'button';
-        openBtn.className = 'btn btn-secondary btn-xs';
-        openBtn.textContent = 'Abrir';
-        openBtn.addEventListener('click', () => {
-          closeModal();
-          openFile(item.path);
+async function showGitModal() {
+  try {
+    const statusRes = await api('/api/git/status');
+    updateGitBadge(statusRes.git);
+  } catch (err) {
+    showToast(err.message, 'err');
+  }
+
+  const renderModalContent = (gitLogText = '', isError = false) => {
+    const info = state.gitInfo;
+    const files = state.gitModified;
+    const selectedSet = new Set(files.map((f) => f.path));
+
+    let msgInputEl;
+    let logPreEl;
+    const checkboxes = [];
+
+    const footerButtons = [
+      { label: 'Cerrar', className: 'btn btn-secondary', onClick: closeModal },
+    ];
+
+    if (info.ahead > 0 && files.length === 0) {
+      footerButtons.push({
+        label: `Hacer Push (↑${info.ahead})`,
+        className: 'btn btn-primary',
+        onClick: async (btn) => {
+          btn.disabled = true;
+          btn.textContent = 'Subiendo...';
+          try {
+            const res = await api('/api/git/push', { method: 'POST', body: '{}' });
+            updateGitBadge(res.git);
+            showToast('Push completado correctamente en GitHub.', 'ok');
+            renderModalContent(res.output, false);
+          } catch (err) {
+            showToast(err.message, 'err');
+            renderModalContent((err.data && err.data.output) || err.message, true);
+          }
+        },
+      });
+    }
+
+    if (files.length > 0) {
+      if (info.ahead > 0) {
+        footerButtons.push({
+          label: `Solo Push (↑${info.ahead})`,
+          className: 'btn btn-accent',
+          onClick: async (btn) => {
+            btn.disabled = true;
+            btn.textContent = 'Subiendo...';
+            try {
+              const res = await api('/api/git/push', { method: 'POST', body: '{}' });
+              updateGitBadge(res.git);
+              showToast('Push completado correctamente.', 'ok');
+              renderModalContent(res.output, false);
+            } catch (err) {
+              showToast(err.message, 'err');
+              renderModalContent((err.data && err.data.output) || err.message, true);
+            }
+          },
         });
-        row.append(label, openBtn);
-        body.appendChild(row);
       }
-    },
-    [{ label: 'Cerrar', className: 'btn btn-primary', onClick: closeModal }]
-  );
+
+      const runCommit = async (withPush, btn) => {
+        if (state.dirty) {
+          showToast('Guarde o descarte primero los cambios pendientes en el editor abierto.', 'err');
+          return;
+        }
+        const message = msgInputEl ? msgInputEl.value.trim() : '';
+        const chosen = Array.from(selectedSet);
+        if (!chosen.length) {
+          showToast('Seleccione al menos un archivo para el commit.', 'err');
+          return;
+        }
+        if (!message) {
+          showToast('Escriba un mensaje de commit.', 'err');
+          if (msgInputEl) msgInputEl.focus();
+          return;
+        }
+        const prevTxt = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = withPush ? 'Enviando commit y push...' : 'Creando commit...';
+        try {
+          const res = await api('/api/git/commit', {
+            method: 'POST',
+            body: JSON.stringify({ message, files: chosen, push: withPush }),
+          });
+          updateGitBadge(res.git);
+          showToast(withPush ? 'Commit y Push completados.' : 'Commit creado correctamente.', 'ok');
+          renderModalContent(res.output || 'Operación completada.', false);
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = prevTxt;
+          showToast(err.message, 'err');
+          renderModalContent((err.data && err.data.output) || err.message, true);
+        }
+      };
+
+      footerButtons.push({
+        label: 'Hacer Commit',
+        className: 'btn btn-accent',
+        onClick: (btn) => runCommit(false, btn),
+      });
+      footerButtons.push({
+        label: 'Commit y Push',
+        className: 'btn btn-primary',
+        onClick: (btn) => runCommit(true, btn),
+      });
+    }
+
+    openModal(
+      'Control de cambios Git (Commit y Push)',
+      (body) => {
+        const metaBar = document.createElement('div');
+        metaBar.className = 'git-meta-bar';
+        const branchSpan = document.createElement('span');
+        branchSpan.textContent = info.available
+          ? `Rama: ${info.branch || '(desconocida)'}${info.upstream ? ` → ${info.upstream}` : ''}`
+          : 'Repositorio Git no disponible';
+        const syncSpan = document.createElement('span');
+        syncSpan.textContent = info.ahead > 0
+          ? `${info.ahead} commit(s) pendientes de Push`
+          : 'Al día con el remoto';
+        metaBar.append(branchSpan, syncSpan);
+        body.appendChild(metaBar);
+
+        if (files.length === 0) {
+          const empty = document.createElement('p');
+          empty.textContent = info.ahead > 0
+            ? 'No hay archivos pendientes de commit, pero tiene commits locales listos para subir con Push.'
+            : 'El árbol de trabajo está limpio. No hay cambios pendientes.';
+          body.appendChild(empty);
+        } else {
+          const toolbar = document.createElement('div');
+          toolbar.className = 'git-toolbar';
+          const countLbl = document.createElement('span');
+          countLbl.className = 'field-label';
+          const updateCountLabel = () => {
+            countLbl.textContent = `${selectedSet.size} de ${files.length} archivo(s) seleccionados`;
+          };
+          updateCountLabel();
+
+          const selBtns = document.createElement('div');
+          selBtns.className = 'git-chip-group';
+          const makeSelBtn = (label, filterFn) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'btn btn-ghost btn-xs';
+            b.textContent = label;
+            b.addEventListener('click', () => {
+              selectedSet.clear();
+              for (const cb of checkboxes) {
+                const check = filterFn(cb.item);
+                cb.input.checked = check;
+                if (check) selectedSet.add(cb.item.path);
+              }
+              updateCountLabel();
+            });
+            return b;
+          };
+          selBtns.append(
+            makeSelBtn('Todo', () => true),
+            makeSelBtn('Solo src/', (it) => it.inSrc),
+            makeSelBtn('Ninguno', () => false)
+          );
+          toolbar.append(countLbl, selBtns);
+          body.appendChild(toolbar);
+
+          const list = document.createElement('div');
+          list.className = 'git-file-list';
+          for (const item of files) {
+            const row = document.createElement('div');
+            row.className = 'git-file-row';
+
+            const lbl = document.createElement('label');
+            lbl.className = 'git-file-label';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = true;
+            cb.addEventListener('change', () => {
+              if (cb.checked) selectedSet.add(item.path);
+              else selectedSet.delete(item.path);
+              updateCountLabel();
+            });
+            checkboxes.push({ input: cb, item });
+
+            const tag = document.createElement('span');
+            tag.className = 'git-status-tag';
+            tag.textContent = item.status;
+
+            const pathSpan = document.createElement('span');
+            pathSpan.className = 'git-file-path';
+            pathSpan.textContent = item.path;
+            pathSpan.title = item.path;
+
+            lbl.append(cb, tag, pathSpan);
+            row.appendChild(lbl);
+
+            if (item.inSrc && item.srcPath && item.status !== 'D') {
+              const openBtn = document.createElement('button');
+              openBtn.type = 'button';
+              openBtn.className = 'btn btn-secondary btn-xs';
+              openBtn.textContent = 'Abrir';
+              openBtn.addEventListener('click', () => {
+                closeModal();
+                openFile(item.srcPath);
+              });
+              row.appendChild(openBtn);
+            }
+            list.appendChild(row);
+          }
+          body.appendChild(list);
+
+          const commitBox = document.createElement('div');
+          commitBox.className = 'git-commit-box';
+          const msgLbl = document.createElement('label');
+          msgLbl.className = 'field-label';
+          msgLbl.textContent = 'Mensaje de commit';
+
+          const chips = document.createElement('div');
+          chips.className = 'git-chip-group';
+          for (const prefix of ['fix(locales): ', 'feat(locales): ', 'chore: ']) {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'btn btn-ghost btn-xs';
+            chip.textContent = prefix.trim();
+            chip.addEventListener('click', () => {
+              if (!msgInputEl.value.startsWith(prefix)) {
+                msgInputEl.value = prefix + msgInputEl.value.replace(/^(fix|feat|chore)(\([^)]*\))?:\s*/i, '');
+              }
+              msgInputEl.focus();
+            });
+            chips.appendChild(chip);
+          }
+
+          msgInputEl = document.createElement('input');
+          msgInputEl.id = 'gitCommitMessageInput';
+          msgInputEl.type = 'text';
+          msgInputEl.className = 'input';
+          msgInputEl.placeholder = 'ej. fix(locales): corregir traducción en guía 0004';
+          msgInputEl.value = 'fix(locales): actualizar traducciones esES';
+
+          commitBox.append(msgLbl, chips, msgInputEl);
+          body.appendChild(commitBox);
+        }
+
+        if (gitLogText) {
+          logPreEl = document.createElement('pre');
+          logPreEl.className = 'log-pre' + (isError ? ' status-bad' : '');
+          logPreEl.textContent = gitLogText;
+          body.appendChild(logPreEl);
+        }
+      },
+      footerButtons
+    );
+  };
+
+  renderModalContent();
 }
 
 function computeLocalMatches() {

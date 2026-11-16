@@ -18,3 +18,6 @@ $RECYCLE.BIN/
 *.bak
 *.tmp
 *~
+
+# Herramienta personal del autor (solo local)
+Abrir-Editor.bat

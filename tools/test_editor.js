@@ -5,6 +5,8 @@ const path = require('node:path');
 const os = require('node:os');
 const http = require('node:http');
 
+const { execFileSync } = require('node:child_process');
+
 const {
   decodeJourneyHtml,
   encodeJourneyHtml,
@@ -16,6 +18,9 @@ const {
   searchInRoot,
   previewReplaceInRoot,
   applyReplaceInRoot,
+  getGitRepoStatus,
+  gitCommitChanges,
+  gitPushChanges,
 } = require('./editor_lib');
 
 const { createEditorServer } = require('./editor_server');
@@ -280,5 +285,98 @@ describe('editor_server HTTP API', () => {
 
     const staticTrav = await requestJson('GET', '/..%2feditor_lib.js');
     assert.equal(staticTrav.status, 400);
+  });
+});
+
+describe('editor git commit and push', () => {
+  let tmpRepo;
+  let bareRemote;
+  let server;
+  let baseUrl;
+
+  before(async () => {
+    bareRemote = fs.mkdtempSync(path.join(os.tmpdir(), 'addons-wow-bare-'));
+    execFileSync('git', ['init', '--bare', '--initial-branch=main'], { cwd: bareRemote, stdio: 'ignore' });
+
+    tmpRepo = makeTempProject();
+    execFileSync('git', ['init', '--initial-branch=main'], { cwd: tmpRepo, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tmpRepo, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 'test@local'], { cwd: tmpRepo, stdio: 'ignore' });
+    execFileSync('git', ['remote', 'add', 'origin', bareRemote], { cwd: tmpRepo, stdio: 'ignore' });
+    execFileSync('git', ['add', '-A'], { cwd: tmpRepo, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'chore: initial'], { cwd: tmpRepo, stdio: 'ignore' });
+    execFileSync('git', ['push', '-u', 'origin', 'main'], { cwd: tmpRepo, stdio: 'ignore' });
+
+    server = createEditorServer({ projectRoot: tmpRepo });
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+    baseUrl = `http://127.0.0.1:${server.address().port}`;
+  });
+
+  after(async () => {
+    await new Promise((resolve) => server.close(resolve));
+    fs.rmSync(tmpRepo, { recursive: true, force: true });
+    fs.rmSync(bareRemote, { recursive: true, force: true });
+  });
+
+  function requestJson(method, urlPath, body) {
+    return new Promise((resolve, reject) => {
+      const req = http.request(`${baseUrl}${urlPath}`, { method, headers: { 'Content-Type': 'application/json' } }, (res) => {
+        let data = '';
+        res.on('data', (c) => (data += c));
+        res.on('end', () => resolve({ status: res.statusCode, body: JSON.parse(data) }));
+      });
+      req.on('error', reject);
+      if (body !== undefined) req.write(JSON.stringify(body));
+      req.end();
+    });
+  }
+
+  it('lists modified files, commits selected files only, and pushes to bare remote', async () => {
+    fs.writeFileSync(path.join(tmpRepo, 'src', 'MoveAny', 'locale', 'esES.lua'), 'local L = { a = 1 }\nreturn L\n', 'utf8');
+    fs.writeFileSync(path.join(tmpRepo, 'README.md'), '# Test\n', 'utf8');
+
+    const status = getGitRepoStatus(tmpRepo);
+    assert.equal(status.available, true);
+    assert.equal(status.branch, 'main');
+    assert.equal(status.ahead, 0);
+    assert.equal(status.modified.length, 2);
+
+    assert.throws(() => gitCommitChanges(tmpRepo, { message: '   ', files: ['README.md'] }), /mensaje/i);
+    assert.throws(() => gitCommitChanges(tmpRepo, { message: 'test', files: ['../outside.txt'] }), /permitida/i);
+
+    const commitRes = await requestJson('POST', '/api/git/commit', {
+      message: 'fix(locales): update MoveAny string',
+      files: ['src/MoveAny/locale/esES.lua'],
+      push: false,
+    });
+    assert.equal(commitRes.status, 200);
+    assert.equal(commitRes.body.ok, true);
+    assert.equal(commitRes.body.git.ahead, 1);
+    assert.equal(commitRes.body.git.modified.length, 1);
+    assert.equal(commitRes.body.git.modified[0].path, 'README.md');
+
+    const pushRes = await requestJson('POST', '/api/git/push', {});
+    assert.equal(pushRes.status, 200);
+    assert.equal(pushRes.body.ok, true);
+    assert.equal(pushRes.body.git.ahead, 0);
+
+    const realPushCheck = await gitPushChanges(tmpRepo);
+    assert.equal(realPushCheck.ok, true);
+
+    // Commits a git-rm --cached + gitignored file cleanly while keeping it on disk
+    fs.writeFileSync(path.join(tmpRepo, 'secret.bat'), '@echo off\n', 'utf8');
+    execFileSync('git', ['add', 'secret.bat'], { cwd: tmpRepo, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'temp add secret'], { cwd: tmpRepo, stdio: 'ignore' });
+    fs.writeFileSync(path.join(tmpRepo, '.gitignore'), 'secret.bat\n', 'utf8');
+    execFileSync('git', ['rm', '--cached', 'secret.bat'], { cwd: tmpRepo, stdio: 'ignore' });
+
+    const rmCachedCommit = await requestJson('POST', '/api/git/commit', {
+      message: 'chore: untrack secret.bat',
+      files: ['.gitignore', 'secret.bat'],
+      push: false,
+    });
+    assert.equal(rmCachedCommit.status, 200);
+    assert.equal(rmCachedCommit.body.ok, true);
+    assert.equal(fs.existsSync(path.join(tmpRepo, 'secret.bat')), true);
   });
 });
