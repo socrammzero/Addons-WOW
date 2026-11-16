@@ -62,7 +62,7 @@ local function ensurePopupFrame()
 
     local tpl = BackdropTemplateMixin and "BackdropTemplate" or nil
     local f = CreateFrame("Frame", "SocramAddonsUpdatePopup", UIParent, tpl)
-    f:SetSize(390, 165)
+    f:SetSize(440, 215)
     f:SetPoint("TOP", UIParent, "TOP", 0, -110)
     f:SetFrameStrata("DIALOG")
     f:SetClampedToScreen(true)
@@ -81,32 +81,45 @@ local function ensurePopupFrame()
             edgeSize = 16,
             insets = { left = 5, right = 5, top = 5, bottom = 5 },
         })
-        f:SetBackdropColor(0.06, 0.08, 0.11, 0.95)
+        f:SetBackdropColor(0.06, 0.08, 0.11, 0.96)
         f:SetBackdropBorderColor(0.90, 0.66, 0.24, 1)
     end
 
+    local closeBtn = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+    closeBtn:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -4)
+    closeBtn:SetScript("OnClick", function()
+        f:Hide()
+    end)
+
     local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    title:SetPoint("TOP", f, "TOP", 0, -16)
+    title:SetPoint("TOP", f, "TOP", 0, -15)
     title:SetText("|cffE5A93CSocram Addons esES|r")
 
+    local divider = f:CreateTexture(nil, "ARTWORK")
+    divider:SetHeight(1)
+    divider:SetPoint("TOPLEFT", f, "TOPLEFT", 18, -40)
+    divider:SetPoint("TOPRIGHT", f, "TOPRIGHT", -18, -40)
+    divider:SetColorTexture(0.90, 0.66, 0.24, 0.35)
+
     local body = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    body:SetPoint("TOPLEFT", f, "TOPLEFT", 20, -46)
-    body:SetPoint("TOPRIGHT", f, "TOPRIGHT", -20, -46)
+    body:SetWidth(392)
+    body:SetPoint("TOP", f, "TOP", 0, -52)
     body:SetJustifyH("CENTER")
-    body:SetSpacing(3)
+    body:SetWordWrap(true)
+    body:SetSpacing(4)
     f.bodyText = body
 
     local reloadBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    reloadBtn:SetSize(190, 28)
-    reloadBtn:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 22, 18)
+    reloadBtn:SetSize(196, 28)
+    reloadBtn:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 24, 18)
     reloadBtn:SetText("Recargar (/reload)")
     reloadBtn:SetScript("OnClick", function()
         ReloadUI()
     end)
 
     local hideBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    hideBtn:SetSize(130, 28)
-    hideBtn:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -22, 18)
+    hideBtn:SetSize(136, 28)
+    hideBtn:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -24, 18)
     hideBtn:SetText("Ocultar")
     hideBtn:SetScript("OnClick", function()
         f:Hide()
@@ -125,8 +138,10 @@ local function showUpdatePopup(remoteBuild, senderName, isTest)
     local line2 = isTest
         and ("Versión local actual: v" .. tostring(myBuild))
         or ("Detectado vía " .. tostring(getShortName(senderName) or "grupo/hermandad") .. ". Tu versión: v" .. tostring(myBuild))
-    local line3 = "1. Abre Actualizar-Traducciones.bat (o espera al modo vigilar).\n2. Pulsa este botón cuando termine:"
+    local line3 = "1. Abre Actualizar-Traducciones.bat (o espera al modo vigilar).\n2. Pulsa «Recargar (/reload)» cuando termine."
     f.bodyText:SetText(line1 .. "\n|cff9FB0C4" .. line2 .. "|r\n\n" .. line3)
+    local textHeight = f.bodyText:GetStringHeight() or 86
+    f:SetHeight(math.max(205, math.ceil(52 + textHeight + 70)))
     f:Show()
 end
 
@@ -143,7 +158,7 @@ local function ensureQuickButton()
 
     local tpl = BackdropTemplateMixin and "BackdropTemplate" or nil
     local b = CreateFrame("Button", "SocramAddonsQuickReloadBtn", UIParent, tpl)
-    b:SetSize(108, 26)
+    b:SetSize(120, 28)
     b:SetFrameStrata("MEDIUM")
     b:SetClampedToScreen(true)
     b:SetMovable(true)
