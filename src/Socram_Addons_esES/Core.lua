@@ -5,8 +5,9 @@ local THROTTLE_SECONDS = 20
 local myBuild = tonumber(SocramAddonsEsES_Build) or 1
 local lastBroadcast = { GUILD = 0, PARTY = 0, RAID = 0, INSTANCE_CHAT = 0 }
 local notifiedThisSession = false
-local popupFrame
-local quickButton
+local pendingRemoteBuild = nil
+local pendingSender = nil
+local reloadButton
 
 local function getShortName(fullName)
     if type(fullName) ~= "string" then return nil end
@@ -30,7 +31,7 @@ end
 
 local function printMsg(text)
     if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
-        DEFAULT_CHAT_FRAME:AddMessage("|cffE5A93C[Socram Addons esES]|r " .. tostring(text))
+        DEFAULT_CHAT_FRAME:AddMessage("|cffE5A93C[Socram esES]|r " .. tostring(text))
     end
 end
 
@@ -57,94 +58,6 @@ local function broadcastAvailableChannels()
     end
 end
 
-local function ensurePopupFrame()
-    if popupFrame then return popupFrame end
-
-    local tpl = BackdropTemplateMixin and "BackdropTemplate" or nil
-    local f = CreateFrame("Frame", "SocramAddonsUpdatePopup", UIParent, tpl)
-    f:SetSize(440, 215)
-    f:SetPoint("TOP", UIParent, "TOP", 0, -110)
-    f:SetFrameStrata("DIALOG")
-    f:SetClampedToScreen(true)
-    f:SetMovable(true)
-    f:EnableMouse(true)
-    f:RegisterForDrag("LeftButton")
-    f:SetScript("OnDragStart", f.StartMoving)
-    f:SetScript("OnDragStop", f.StopMovingOrSizing)
-
-    if f.SetBackdrop then
-        f:SetBackdrop({
-            bgFile = "Interface\\Buttons\\WHITE8X8",
-            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-            tile = true,
-            tileSize = 16,
-            edgeSize = 16,
-            insets = { left = 5, right = 5, top = 5, bottom = 5 },
-        })
-        f:SetBackdropColor(0.06, 0.08, 0.11, 0.96)
-        f:SetBackdropBorderColor(0.90, 0.66, 0.24, 1)
-    end
-
-    local closeBtn = CreateFrame("Button", nil, f, "UIPanelCloseButton")
-    closeBtn:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -4)
-    closeBtn:SetScript("OnClick", function()
-        f:Hide()
-    end)
-
-    local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    title:SetPoint("TOP", f, "TOP", 0, -15)
-    title:SetText("|cffE5A93CSocram Addons esES|r")
-
-    local divider = f:CreateTexture(nil, "ARTWORK")
-    divider:SetHeight(1)
-    divider:SetPoint("TOPLEFT", f, "TOPLEFT", 18, -40)
-    divider:SetPoint("TOPRIGHT", f, "TOPRIGHT", -18, -40)
-    divider:SetColorTexture(0.90, 0.66, 0.24, 0.35)
-
-    local body = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    body:SetWidth(392)
-    body:SetPoint("TOP", f, "TOP", 0, -52)
-    body:SetJustifyH("CENTER")
-    body:SetWordWrap(true)
-    body:SetSpacing(4)
-    f.bodyText = body
-
-    local reloadBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    reloadBtn:SetSize(196, 28)
-    reloadBtn:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 24, 18)
-    reloadBtn:SetText("Recargar (/reload)")
-    reloadBtn:SetScript("OnClick", function()
-        ReloadUI()
-    end)
-
-    local hideBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    hideBtn:SetSize(136, 28)
-    hideBtn:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -24, 18)
-    hideBtn:SetText("Ocultar")
-    hideBtn:SetScript("OnClick", function()
-        f:Hide()
-    end)
-
-    f:Hide()
-    popupFrame = f
-    return f
-end
-
-local function showUpdatePopup(remoteBuild, senderName, isTest)
-    local f = ensurePopupFrame()
-    local line1 = isTest
-        and "Vista previa del aviso de actualización."
-        or ("¡Hay nuevas traducciones disponibles! (v" .. tostring(remoteBuild) .. ")")
-    local line2 = isTest
-        and ("Versión local actual: v" .. tostring(myBuild))
-        or ("Detectado vía " .. tostring(getShortName(senderName) or "grupo/hermandad") .. ". Tu versión: v" .. tostring(myBuild))
-    local line3 = "1. Abre Actualizar-Traducciones.bat (o espera al modo vigilar).\n2. Pulsa «Recargar (/reload)» cuando termine."
-    f.bodyText:SetText(line1 .. "\n|cff9FB0C4" .. line2 .. "|r\n\n" .. line3)
-    local textHeight = f.bodyText:GetStringHeight() or 86
-    f:SetHeight(math.max(205, math.ceil(52 + textHeight + 70)))
-    f:Show()
-end
-
 local function saveButtonPos(btn)
     if not SocramAddonsEsES_DB then return end
     local point, _, relPoint, x, y = btn:GetPoint(1)
@@ -153,20 +66,42 @@ local function saveButtonPos(btn)
     end
 end
 
-local function ensureQuickButton()
-    if quickButton then return quickButton end
+local function applyButtonVisuals(btn)
+    if not btn then return end
+    if pendingRemoteBuild then
+        btn.label:SetText("|cffFFD100Recargar (!)|r")
+        if btn.SetBackdropBorderColor then
+            btn:SetBackdropBorderColor(1, 0.82, 0.10, 1)
+        end
+        if btn.SetBackdropColor then
+            btn:SetBackdropColor(0.22, 0.14, 0.04, 0.94)
+        end
+    else
+        btn.label:SetText("|cffE5A93CRecargar|r")
+        if btn.SetBackdropBorderColor then
+            btn:SetBackdropBorderColor(0.75, 0.56, 0.22, 0.85)
+        end
+        if btn.SetBackdropColor then
+            btn:SetBackdropColor(0.06, 0.08, 0.11, 0.82)
+        end
+    end
+end
+
+local function ensureReloadButton()
+    if reloadButton then return reloadButton end
 
     local tpl = BackdropTemplateMixin and "BackdropTemplate" or nil
     local b = CreateFrame("Button", "SocramAddonsQuickReloadBtn", UIParent, tpl)
-    b:SetSize(120, 28)
+    b:SetSize(96, 24)
     b:SetFrameStrata("MEDIUM")
     b:SetClampedToScreen(true)
     b:SetMovable(true)
     b:EnableMouse(true)
-    b:RegisterForDrag("LeftButton")
+    b:RegisterForDrag("RightButton")
     b:RegisterForClicks("LeftButtonUp")
+
     b:SetScript("OnDragStart", function(self)
-        if IsShiftKeyDown() then self:StartMoving() end
+        self:StartMoving()
     end)
     b:SetScript("OnDragStop", function(self)
         self:StopMovingOrSizing()
@@ -179,8 +114,17 @@ local function ensureQuickButton()
         if GameTooltip then
             GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
             GameTooltip:AddLine("Socram Addons esES (v" .. tostring(myBuild) .. ")", 0.90, 0.66, 0.24)
-            GameTooltip:AddLine("Clic izquierdo: recargar interfaz (/reload)", 1, 1, 1)
-            GameTooltip:AddLine("Shift + arrastrar: mover botón", 0.7, 0.75, 0.82)
+            if pendingRemoteBuild then
+                GameTooltip:AddLine("¡Nueva versión disponible: v" .. tostring(pendingRemoteBuild) .. "!", 0.25, 0.95, 0.40)
+                if pendingSender then
+                    GameTooltip:AddLine("Detectado vía: " .. tostring(pendingSender), 0.75, 0.82, 0.90)
+                end
+                GameTooltip:AddLine("Actualiza con el .bat y haz clic aquí.", 1, 1, 1)
+            else
+                GameTooltip:AddLine("Clic izquierdo: recargar UI (/reload)", 1, 1, 1)
+            end
+            GameTooltip:AddLine("Clic derecho + arrastrar: mover botón", 0.70, 0.75, 0.82)
+            GameTooltip:AddLine("/socram fijo: fijar u ocultar botón", 0.70, 0.75, 0.82)
             GameTooltip:Show()
         end
     end)
@@ -197,29 +141,41 @@ local function ensureQuickButton()
             edgeSize = 12,
             insets = { left = 3, right = 3, top = 3, bottom = 3 },
         })
-        b:SetBackdropColor(0.08, 0.10, 0.14, 0.90)
-        b:SetBackdropBorderColor(0.90, 0.66, 0.24, 0.95)
     end
 
     local txt = b:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     txt:SetPoint("CENTER")
-    txt:SetText("|cffE5A93CRecargar UI|r")
+    b.label = txt
 
     local pos = SocramAddonsEsES_DB and SocramAddonsEsES_DB.btnPoint
     if pos and type(pos) == "table" and pos[1] then
         b:SetPoint(pos[1], UIParent, pos[2] or pos[1], pos[3] or 0, pos[4] or 0)
     else
-        b:SetPoint("TOP", UIParent, "TOP", 0, -14)
+        b:SetPoint("TOP", UIParent, "TOP", 0, -6)
     end
 
-    if SocramAddonsEsES_DB and SocramAddonsEsES_DB.showButton then
+    applyButtonVisuals(b)
+    if (SocramAddonsEsES_DB and SocramAddonsEsES_DB.pinned) or pendingRemoteBuild then
         b:Show()
     else
         b:Hide()
     end
 
-    quickButton = b
+    reloadButton = b
     return b
+end
+
+local function notifyNewVersion(remoteBuild, senderName, isTest)
+    pendingRemoteBuild = remoteBuild
+    pendingSender = getShortName(senderName) or "grupo/hermandad"
+    local b = ensureReloadButton()
+    applyButtonVisuals(b)
+    b:Show()
+    if isTest then
+        printMsg("Vista previa activada en el botón 'Recargar (!)' (v" .. tostring(myBuild) .. ").")
+    else
+        printMsg("Hay nuevas traducciones disponibles (v" .. tostring(remoteBuild) .. ", tienes v" .. tostring(myBuild) .. "). Actualiza con el .bat y pulsa 'Recargar (!)'.")
+    end
 end
 
 local frame = CreateFrame("Frame")
@@ -231,11 +187,18 @@ frame:RegisterEvent("CHAT_MSG_ADDON")
 
 frame:SetScript("OnEvent", function(_, event, arg1, arg2, arg3, arg4)
     if event == "ADDON_LOADED" and arg1 == ADDON_NAME then
-        SocramAddonsEsES_DB = SocramAddonsEsES_DB or { showButton = false }
+        if type(SocramAddonsEsES_DB) ~= "table" then
+            SocramAddonsEsES_DB = { pinned = false }
+        else
+            SocramAddonsEsES_DB.showButton = nil
+            if SocramAddonsEsES_DB.pinned == nil then
+                SocramAddonsEsES_DB.pinned = false
+            end
+        end
         if C_ChatInfo and C_ChatInfo.RegisterAddonMessagePrefix then
             C_ChatInfo.RegisterAddonMessagePrefix(PREFIX)
         end
-        ensureQuickButton()
+        ensureReloadButton()
         return
     end
 
@@ -263,8 +226,7 @@ frame:SetScript("OnEvent", function(_, event, arg1, arg2, arg3, arg4)
 
         if remoteBuild > myBuild and not notifiedThisSession then
             notifiedThisSession = true
-            printMsg("Hay nuevas traducciones disponibles (v" .. tostring(remoteBuild) .. ", tienes v" .. tostring(myBuild) .. "). Ejecuta Actualizar-Traducciones.bat y pulsa Recargar.")
-            showUpdatePopup(remoteBuild, sender, false)
+            notifyNewVersion(remoteBuild, sender, false)
         end
     end
 end)
@@ -278,22 +240,38 @@ SlashCmdList["SOCRAMADDONS"] = function(msg)
         return
     end
     if cmd == "test" then
-        showUpdatePopup(myBuild + 1, UnitName and UnitName("player") or "Socram", true)
+        notifyNewVersion(myBuild + 1, playerFullName() or "Socram", true)
         return
     end
-    if cmd == "boton" or cmd == "button" then
+    if cmd == "reset" then
         SocramAddonsEsES_DB = SocramAddonsEsES_DB or {}
-        SocramAddonsEsES_DB.showButton = not SocramAddonsEsES_DB.showButton
-        local b = ensureQuickButton()
-        if SocramAddonsEsES_DB.showButton then
+        SocramAddonsEsES_DB.btnPoint = nil
+        local b = ensureReloadButton()
+        b:ClearAllPoints()
+        b:SetPoint("TOP", UIParent, "TOP", 0, -6)
+        if SocramAddonsEsES_DB.pinned or pendingRemoteBuild then
             b:Show()
-            printMsg("Botón rápido 'Recargar UI' activado (Shift + arrastrar para moverlo).")
+        end
+        printMsg("Posición del botón restablecida arriba en el centro.")
+        return
+    end
+    if cmd == "fijo" or cmd == "boton" or cmd == "button" or cmd == "ocultar" or cmd == "mostrar" then
+        SocramAddonsEsES_DB = SocramAddonsEsES_DB or {}
+        local b = ensureReloadButton()
+        local pin = not (SocramAddonsEsES_DB.pinned == true)
+        if cmd == "ocultar" then pin = false elseif cmd == "mostrar" then pin = true end
+        SocramAddonsEsES_DB.pinned = pin
+        if pin then
+            b:Show()
+            printMsg("Botón 'Recargar' fijado en pantalla (clic derecho + arrastrar para moverlo).")
         else
+            pendingRemoteBuild = nil
+            applyButtonVisuals(b)
             b:Hide()
-            printMsg("Botón rápido ocultado.")
+            printMsg("Botón fijo desactivado. Solo saldrá si se detecta una actualización (usa /socram fijo para fijarlo).")
         end
         return
     end
-    printMsg("Versión instalada: v" .. tostring(myBuild) .. " | Prefijo: " .. PREFIX)
-    printMsg("Comandos: /socram reload (o /esreload) · /socram boton (mostrar/ocultar botón fijo) · /socram test (probar aviso)")
+    printMsg("Versión v" .. tostring(myBuild) .. " | Prefijo: " .. PREFIX .. " | Botón fijo: " .. ((SocramAddonsEsES_DB and SocramAddonsEsES_DB.pinned) and "SÍ" or "NO"))
+    printMsg("Comandos: /socram fijo (fijar u ocultar botón) · /socram test (probar aviso) · /socram reset · /esreload")
 end
