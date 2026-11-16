@@ -166,6 +166,13 @@
       "sync": true,
       "priority": "Alta",
       "method": "A (Descripciones emergentes y ayuda en español)"
+    },
+    {
+      "name": "Socram Addons esES",
+      "folderName": "Socram_Addons_esES",
+      "sync": true,
+      "priority": "Alta",
+      "method": "Addon ligero de aviso de versión (SOCRAM_ADDONS_ES) y botón /reload"
     }
   ]
 }

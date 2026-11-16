@@ -1,0 +1,9 @@
+## Interface: 11509, 16001, 20506, 50504, 120100
+## Title: Socram Addons esES
+## Notes: Avisa dentro del juego si hay nuevas traducciones de Socram y ofrece un botón rápido de /reload.
+## Author: Marcos (Socram)
+## Version: 2026111602
+## SavedVariables: SocramAddonsEsES_DB
+
+Version.lua
+Core.lua
