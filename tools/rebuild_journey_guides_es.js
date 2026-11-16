@@ -301,7 +301,7 @@ const GLOSSARY = {
   'crabs': 'cangrejos',
   'Webwood Spiders': 'Arañas Tejeseda',
   'Darkshore Thresher': 'Azotador de Costa Oscura',
-  'Darkshore Threshers': 'Azotadores de Costa Oscura',
+  'Darkshore Threshers': 'Trilladores de Costa Oscura',
   'Prairie Stalkers': 'Acechadores de la pradera',
   'Sickly Gazelles': 'Gacelas enfermizas',
   'Tunnel Rat': 'Rata de túnel',
