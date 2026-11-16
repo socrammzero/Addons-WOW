@@ -300,7 +300,7 @@ const GLOSSARY = {
   'Red Portal': 'Portal rojo',
   'crabs': 'cangrejos',
   'Webwood Spiders': 'Arañas Tejeseda',
-  'Darkshore Thresher': 'Azotador de Costa Oscura',
+  'Darkshore Thresher': 'Trillador de Costa Oscura',
   'Darkshore Threshers': 'Trilladores de Costa Oscura',
   'Prairie Stalkers': 'Acechadores de la pradera',
   'Sickly Gazelles': 'Gacelas enfermizas',
