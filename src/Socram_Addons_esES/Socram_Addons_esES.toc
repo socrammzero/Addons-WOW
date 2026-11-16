@@ -2,7 +2,7 @@
 ## Title: Socram Addons esES
 ## Notes: Avisa dentro del juego si hay nuevas traducciones de Socram y ofrece un botón rápido de /reload.
 ## Author: Marcos (Socram)
-## Version: 2026111606
+## Version: 2026111607
 ## SavedVariables: SocramAddonsEsES_DB
 
 Version.lua
