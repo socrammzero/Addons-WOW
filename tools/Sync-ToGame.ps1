@@ -8,11 +8,14 @@
     (Opcional) Nombre o carpeta del addon específico a sincronizar. Si se omite, sincroniza todos los activos.
 .PARAMETER DryRun
     Si se especifica, simula la copia sin modificar ningún archivo en el juego.
+.PARAMETER ForceAll
+    Fuerza la copia de todos los archivos aunque ya sean idénticos en destino.
 #>
 [CmdletBinding()]
 param (
     [string]$AddonName = "",
-    [switch]$DryRun
+    [switch]$DryRun,
+    [switch]$ForceAll
 )
 
 $ErrorActionPreference = "Stop"
@@ -54,12 +57,27 @@ if (-not $targetAddons) {
 }
 
 $copiedCount = 0
+$skippedCount = 0
+
+function Test-FilesIdentical([System.IO.FileInfo]$srcFile, [string]$destPath) {
+    if (-not (Test-Path -LiteralPath $destPath)) { return $false }
+    $dstInfo = Get-Item -LiteralPath $destPath
+    if ($srcFile.Length -ne $dstInfo.Length) { return $false }
+    if ([Math]::Abs(($srcFile.LastWriteTimeUtc - $dstInfo.LastWriteTimeUtc).TotalMilliseconds) -le 10) {
+        return $true
+    }
+    $sBytes = [System.IO.File]::ReadAllBytes($srcFile.FullName)
+    $dBytes = [System.IO.File]::ReadAllBytes($destPath)
+    if ($sBytes.Length -ne $dBytes.Length) { return $false }
+    for ($i = 0; $i -lt $sBytes.Length; $i++) {
+        if ($sBytes[$i] -ne $dBytes[$i]) { return $false }
+    }
+    return $true
+}
 
 foreach ($addon in $targetAddons) {
     $srcAddonDir = Join-Path $projectRoot "src\$($addon.folderName)"
     $destAddonDir = Join-Path $wowPath $addon.folderName
-
-    Write-Host "Procesando: $($addon.name) [$($addon.folderName)]" -ForegroundColor Yellow
 
     if (-not (Test-Path $srcAddonDir)) {
         Write-Warning "  El directorio fuente no existe: $srcAddonDir. Omitiendo."
@@ -69,32 +87,35 @@ foreach ($addon in $targetAddons) {
     $sourceFiles = Get-ChildItem -Path $srcAddonDir -Recurse -File | Where-Object { $_.Name -ne "README.md" -and $_.Name -ne ".gitkeep" }
 
     if (-not $sourceFiles) {
-        Write-Host "  Sin archivos de traduccion en 'src/$($addon.folderName)'. Omitiendo." -ForegroundColor DarkGray
         continue
     }
 
-    if (-not (Test-Path $destAddonDir)) {
-        Write-Warning "  El addon no parece estar instalado en WoW ($destAddonDir)."
-        if (-not $DryRun) {
-            New-Item -ItemType Directory -Path $destAddonDir -Force | Out-Null
-            Write-Host "  Directorio de destino creado." -ForegroundColor DarkGray
-        }
-    }
+    $addonCopied = 0
 
     foreach ($file in $sourceFiles) {
         $relativePath = $file.FullName.Substring($srcAddonDir.Length).TrimStart("\", "/")
         $targetFilePath = Join-Path $destAddonDir $relativePath
         $targetDir = Split-Path -Parent $targetFilePath
 
+        $same = (-not $ForceAll) -and (Test-FilesIdentical $file $targetFilePath)
+        if ($same) {
+            $skippedCount++
+            continue
+        }
+
         if ($DryRun) {
+            if ($addonCopied -eq 0) { Write-Host "Procesando: $($addon.name) [$($addon.folderName)]" -ForegroundColor Yellow }
             Write-Host "  [Simulacion] Se copiaria: $relativePath" -ForegroundColor DarkCyan
+            $addonCopied++
         } else {
+            if ($addonCopied -eq 0) { Write-Host "Procesando: $($addon.name) [$($addon.folderName)]" -ForegroundColor Yellow }
             if (-not (Test-Path $targetDir)) {
                 New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
             }
             Copy-Item -Path $file.FullName -Destination $targetFilePath -Force
             Write-Host "  [Copiado] $relativePath" -ForegroundColor Green
             $copiedCount++
+            $addonCopied++
         }
     }
 }
@@ -103,7 +124,7 @@ Write-Host "`n----------------------------------------------------------" -Foreg
 if ($DryRun) {
     Write-Host "Simulacion completada exitosamente." -ForegroundColor Cyan
 } else {
-    Write-Host "Sincronizacion completada con exito. Total de archivos transferidos: $copiedCount" -ForegroundColor Green
+    Write-Host "Sincronizacion completada con exito. Copiados: $copiedCount | Sin cambios: $skippedCount" -ForegroundColor Green
     Write-Host "Recordatorio: Si el juego esta abierto, escriba '/reload' en el chat para aplicar los cambios." -ForegroundColor Yellow
 }
 Write-Host "----------------------------------------------------------`n" -ForegroundColor Cyan
