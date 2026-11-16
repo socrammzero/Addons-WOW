@@ -6,7 +6,7 @@
 ## Notes-esES: Listas de equipo para esta clase. GearQuest Forever lo carga automáticamente cuando juegas o simulas con ella.
 ## Notes-esMX: Listas de equipo para esta clase. GearQuest Forever lo carga automáticamente cuando juegas o simulas con ella.
 ## Author: Henrik8210
-## Version: 1.1.9
+## Version: 1.2.0
 ## IconTexture: Interface\Icons\ClassIcon_Warrior
 ## LoadOnDemand: 1
 ## Dependencies: GearQuestForever
