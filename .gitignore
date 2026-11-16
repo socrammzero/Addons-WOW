@@ -21,3 +21,7 @@ $RECYCLE.BIN/
 
 # Herramienta personal del autor (solo local)
 Abrir-Editor.bat
+tools/editor_lib.js
+tools/editor_server.js
+tools/editor_ui/
+tools/test_editor.js
