@@ -226,21 +226,7 @@ end);
 local NPC_ICON_CVAR = "SoftTargetIconInteract";
 local pendingCVar = false;
 
-local function GetCVarValue(name)
-	local ok, value = pcall(C_CVar.GetCVar, name);
-	if ok then
-		return value;
-	end
-end
-
-local function SetCVarValue(name, value)
-	local current = GetCVarValue(name);
-	value = tostring(value);
-	if current == nil or current == value then
-		return;
-	end
-	pcall(C_CVar.SetCVar, name, value);
-end
+local GetCVarValue, SetCVarValue = ns.GetCVarValue, ns.SetCVarValue;
 
 local function ApplyNpcCVar()
 	local db = ns.db;

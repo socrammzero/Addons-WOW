@@ -6,7 +6,7 @@
 ## Notes-esES: Español, francés, alemán y los demás idiomas del cliente. GearQuest lo carga automáticamente cuando se selecciona un idioma distinto del inglés. Desactívalo para mantener GearQuest en inglés.
 ## Notes-esMX: Español, francés, alemán y los demás idiomas del cliente. GearQuest lo carga automáticamente cuando se selecciona un idioma distinto del inglés. Desactívalo para mantener GearQuest en inglés.
 ## Author: Henrik8210
-## Version: 1.2.0
+## Version: 1.2.1
 ## IconTexture: Interface\Icons\INV_Misc_Book_09
 ## LoadOnDemand: 1
 ## OptionalDeps: GearQuestForever

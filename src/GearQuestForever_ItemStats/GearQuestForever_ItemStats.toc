@@ -1,0 +1,15 @@
+## Interface: 16001
+## Title: GearQuest Forever: Item Stats
+## Notes: Item stats for custom specs. GearQuest Forever loads this the first time a custom spec is scored.
+## Title-esES: GearQuest Forever: Estadísticas de objetos
+## Title-esMX: GearQuest Forever: Estadísticas de objetos
+## Notes-esES: Estadísticas de objetos para especializaciones personalizadas. GearQuest Forever lo carga automáticamente la primera vez que se puntúa una especialización personalizada.
+## Notes-esMX: Estadísticas de objetos para especializaciones personalizadas. GearQuest Forever lo carga automáticamente la primera vez que se puntúa una especialización personalizada.
+## Author: Henrik8210
+## Version: 1.2.1
+## IconTexture: Interface\AddOns\GearQuestForever\Art\GearQuest-Icon
+## LoadOnDemand: 1
+## Dependencies: GearQuestForever
+## RequiredDeps: GearQuestForever
+
+Data.ItemStats.generated.lua

@@ -56,8 +56,7 @@ local OFFSET_Y = -45;      -- from the nameplate down to the object (pixels)
 local SPREAD = 46;         -- radius the glints appear in (pixels)
 local GLINT_SIZE = 34;
 local GLINT_COUNT = 7;
-local GOLD = { 1, 0.88, 0.52 };
-local GREY = { 0.62, 0.62, 0.62 };
+local GOLD, GREY = ns.GOLD, ns.GREY;
 
 local POLL_INTERVAL = 0.12; -- re-check of target and state (seconds)
 local FADE_IN = 0.35;
@@ -72,27 +71,6 @@ local MANAGED_CVARS = {
 	"SoftTargetInteractArc", "SoftTargetInteractOnlyInRange", "SoftTargetIconGameObject",
 };
 
-
--- Cursor files (Interface\Cursor\*.blp) -> category
-local CURSOR_CATEGORY = {
-	Mine = "ore",
-	GatherHerbs = "herb",
-	Quest = "quest", QuestRepeatable = "quest", QuestTurnIn = "quest",
-	Interact = "other", PickLock = "other", LootAll = "other", Pickup = "other",
-};
-
--- The client returns a fileID, a path (Interface\Cursor\Mine) or an atlas name
--- (Cursor_Crosshair_UnableMine_64), so keywords are searched in the string.
-local CURSOR_KEYWORDS = {
-	{ "gather", "herb" },
-	{ "mine", "ore" },
-	{ "quest", "quest" },
-	{ "lootall", "other" },
-	{ "pickup", "other" },
-	{ "picklock", "other" },
-	{ "interact", "other" },
-};
-
 local db;
 local ready = false;         -- cvars are left alone until Forever Loot Sparkles has restored its own
 local gateOpen;             -- is the game's own target nameplate on? nil = apply again
@@ -101,29 +79,15 @@ local pendingForce = false; -- the pending "apply" also switches the interact ke
 local paused;               -- nil, "unit" or "combat"; declared here because ApplyCVars/RestoreCVars reset it
 local directWorks = false;  -- GetNamePlateForUnit("softinteract") has worked for an object
 local activeUnits = {};     -- nameplateN token -> true
-local cursorLookup = {};    -- fileID -> { category, greyed out }
-local questTexts = {};      -- unfinished objectives, lower case without counters
-local questsDirty = true;
 
 local sparkle = {};         -- the one sparkle frame and its animation state
 
 local sin, cos, sqrt, random, min, max, pi = math.sin, math.cos, math.sqrt, math.random, math.min, math.max, math.pi;
 
-local function IsSecret(value)
-	return issecretvalue ~= nil and issecretvalue(value);
-end
-
--- Calls that touch other units can error or return secret values; both count as "unknown"
-local function SafeCall(func, ...)
-	if not func then
-		return nil;
-	end
-	local ok, result = pcall(func, ...);
-	if not ok or IsSecret(result) then
-		return nil;
-	end
-	return result;
-end
+-- shared helpers from Coloring.lua
+local IsSecret, SafeCall = ns.IsSecret, ns.SafeCall;
+local GetCVarValue, SetCVarValue = ns.GetCVarValue, ns.SetCVarValue;
+local Classify = ns.ClassifyObject;
 
 local function Lerp(a, b, t)
 	return a + (b - a) * t;
@@ -151,25 +115,6 @@ end
 ---------------------------------------------------------------------------
 -- Cvars
 ---------------------------------------------------------------------------
-
-local function GetCVarValue(name)
-	local ok, value = pcall(C_CVar.GetCVar, name);
-	if ok then
-		return value;
-	end
-end
-
--- Only touches cvars this client knows, and only when the value changes:
--- CVAR_UPDATE is synchronous, so every write runs Blizzard's handlers tainted
--- by this addon (seen as a GetAuraDataByIndex taint error from Edit Mode)
-local function SetCVarValue(name, value)
-	local current = GetCVarValue(name);
-	value = tostring(value);
-	if current == nil or current == value then
-		return;
-	end
-	pcall(C_CVar.SetCVar, name, value);
-end
 
 -- The game's nameplate on the interaction target, which the sparkle hangs on.
 -- It is only switched on for objects that get a sparkle, so NPCs, mailboxes
@@ -310,143 +255,6 @@ end
 ---------------------------------------------------------------------------
 -- Classification
 ---------------------------------------------------------------------------
-
-local probe = UIParent:CreateTexture(nil, "BACKGROUND"); -- hidden, reads the cursor icon
-probe:Hide();
-
-if GetFileIDFromPath then
-	for name, category in pairs(CURSOR_CATEGORY) do
-		for _, prefix in ipairs({ "", "Unable" }) do
-			local path = "Interface\\Cursor\\" .. prefix .. name;
-			local id = SafeCall(GetFileIDFromPath, path) or SafeCall(GetFileIDFromPath, path .. ".blp");
-			if id then
-				cursorLookup[id] = { category, prefix ~= "" };
-			end
-		end
-	end
-end
-
-local function NormalizeText(text)
-	text = text:lower():gsub("\194\160", " "); -- non-breaking space
-	text = text:gsub("\226\128\153", "'");     -- typographic apostrophe
-	text = text:gsub("%d+%s*/%s*%d+", "");
-	text = text:gsub("^[%s:%-]+", ""):gsub("[%s:%-]+$", "");
-	return text;
-end
-
-local function RebuildQuestTexts()
-	questsDirty = false;
-	wipe(questTexts);
-	if not (C_QuestLog and C_QuestLog.GetQuestObjectives) then
-		return;
-	end
-	local modern = C_QuestLog.GetNumQuestLogEntries and C_QuestLog.GetQuestIDForLogIndex;
-	for index = 1, SafeCall(modern and C_QuestLog.GetNumQuestLogEntries or GetNumQuestLogEntries) or 0 do
-		local questID;
-		if modern then
-			questID = SafeCall(C_QuestLog.GetQuestIDForLogIndex, index);
-		elseif GetQuestLogTitle then
-			local ok, _, _, _, isHeader, _, _, _, id = pcall(GetQuestLogTitle, index);
-			if ok and not isHeader then
-				questID = id;
-			end
-		end
-		local objectives = type(questID) == "number" and SafeCall(C_QuestLog.GetQuestObjectives, questID);
-		if type(objectives) == "table" then
-			for _, objective in ipairs(objectives) do
-				local text = objective.text;
-				if not objective.finished and type(text) == "string" and not IsSecret(text) then
-					text = NormalizeText(text);
-					if #text >= 4 then
-						questTexts[#questTexts + 1] = text;
-					end
-				end
-			end
-		end
-	end
-end
-
--- Is the object's name part of an unfinished objective ("Soaked Saw: 0/1"), or
--- the objective part of its name ("Supplies" in "Crate of Supplies")?
-local function MatchesObjective(name)
-	if type(name) ~= "string" or #name < 4 then
-		return false;
-	end
-	if questsDirty then
-		RebuildQuestTexts();
-	end
-	name = NormalizeText(name);
-	for _, text in ipairs(questTexts) do
-		if text:find(name, 1, true) or (#text >= 5 and name:find(text, 1, true)) then
-			return true;
-		end
-	end
-	return false;
-end
-
-local QUEST_LINE_TYPE = Enum and Enum.TooltipDataLineType and Enum.TooltipDataLineType.QuestObjective;
-
-local function IsQuestRelated(unit, name)
-	if C_QuestLog and C_QuestLog.UnitIsRelatedToActiveQuest
-		and SafeCall(C_QuestLog.UnitIsRelatedToActiveQuest, unit) == true then
-		return true;
-	end
-	if QUEST_LINE_TYPE and C_TooltipInfo and C_TooltipInfo.GetUnit then
-		local data = SafeCall(C_TooltipInfo.GetUnit, unit);
-		if data and data.lines then
-			for _, line in ipairs(data.lines) do
-				if line.type == QUEST_LINE_TYPE then
-					return true;
-				end
-			end
-		end
-	end
-	return MatchesObjective(name);
-end
-
--- Category and "greyed out" flag (Unable variant: can't interact right now) of a cursor name
-local function ReadCursorName(name)
-	if type(name) ~= "string" then
-		return nil;
-	end
-	name = name:lower();
-	local blocked = name:find("unable", 1, true) ~= nil;
-	for _, entry in ipairs(CURSOR_KEYWORDS) do
-		if name:find(entry[1], 1, true) then
-			return entry[2], blocked;
-		end
-	end
-	return nil, blocked;
-end
-
--- Returns the object's category and whether its cursor is greyed out
-local function Classify(unit, name)
-	local category, blocked;
-	if SafeCall(SetUnitCursorTexture, probe, unit, nil, true) then
-		local texture = probe:GetTexture();
-		local atlas = probe.GetAtlas and probe:GetAtlas();
-		if IsSecret(texture) then
-			texture = nil;
-		end
-		if IsSecret(atlas) then
-			atlas = nil;
-		end
-		local known = type(texture) == "number" and cursorLookup[texture];
-		if known then
-			category, blocked = known[1], known[2];
-		else
-			category, blocked = ReadCursorName(texture);
-			if not category then
-				local fromAtlas, atlasBlocked = ReadCursorName(atlas);
-				category, blocked = fromAtlas, blocked or atlasBlocked;
-			end
-		end
-	end
-	if category ~= "ore" and category ~= "herb" and IsQuestRelated(unit, name) then
-		category = "quest";
-	end
-	return category, blocked or false;
-end
 
 -- Does the corpse still hold loot this character may take? pcall instead of
 -- SafeCall: both return values are needed.
@@ -808,17 +616,13 @@ local handlers = {};
 -- Forever Loot Sparkles 2.x puts its old soft targeting values back at login
 -- and once more 5 seconds later. This module starts after that.
 local START_DELAY = 6;
-local startTimer = CreateFrame("Frame");
-startTimer:Hide();
 local startAt;
-startTimer:SetScript("OnUpdate", function(self)
-	if GetTime() < startAt then
+
+local function TryStart()
+	if ForeverLootSparklesDB and ForeverLootSparklesDB.savedCVars and GetTime() < startAt + 30 then
+		C_Timer.After(0.5, TryStart); -- its restore hasn't run yet (combat): wait for it
 		return;
 	end
-	if ForeverLootSparklesDB and ForeverLootSparklesDB.savedCVars and GetTime() < startAt + 30 then
-		return; -- its restore hasn't run yet (combat): wait for it
-	end
-	self:Hide();
 	ready = true;
 	-- a pause left over from the last session (logout while paused)
 	if db.pausedInteract ~= nil and not InCombatLockdown() then
@@ -828,11 +632,11 @@ startTimer:SetScript("OnUpdate", function(self)
 		ApplyCVars();
 	end
 	UpdatePoller();
-end);
+end
 
 function handlers.PLAYER_LOGIN()
 	startAt = GetTime() + START_DELAY;
-	startTimer:Show();
+	C_Timer.After(START_DELAY, TryStart);
 end
 
 -- Account-synced settings can arrive after PLAYER_LOGIN and overwrite ours
@@ -890,10 +694,6 @@ function handlers.PLAYER_SOFT_INTERACT_CHANGED(oldTarget, newTarget)
 	Evaluate();
 end
 
-function handlers.QUEST_LOG_UPDATE()
-	questsDirty = true;
-end
-
 local events = CreateFrame("Frame");
 events:SetScript("OnEvent", function(_, event, ...)
 	if db then
@@ -927,11 +727,7 @@ function ns.DebugTarget()
 	local guid = SafeCall(UnitGUID, u);
 	out("name=", name, "guid=", guid, "objectID=", ObjectID(u));
 	out("gameObject=", SafeCall(UnitIsGameObject, u), "exists=", SafeCall(UnitExists, u), "dead=", SafeCall(UnitIsDead, u));
-	local texture, atlas;
-	if SafeCall(SetUnitCursorTexture, probe, u, nil, true) then
-		texture = probe:GetTexture();
-		atlas = probe.GetAtlas and probe:GetAtlas();
-	end
+	local texture, atlas = ns.CursorTexture(u);
 	out("cursor texture=", texture, "atlas=", atlas);
 	local category, blocked = Classify(u, name);
 	out("classified=", category, "blocked=", blocked, "footlocker=", IsFootlocker(u, name),

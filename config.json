@@ -147,6 +147,12 @@
       "description": "Datos de clase (Guerrero) para GearQuest Forever."
     },
     {
+      "name": "GearQuestForever_ItemStats",
+      "folderName": "GearQuestForever_ItemStats",
+      "sync": true,
+      "description": "Estadísticas de objetos bajo demanda para especializaciones personalizadas de GearQuest Forever."
+    },
+    {
       "name": "HealBot Continued",
       "folderName": "HealBot",
       "sync": true,

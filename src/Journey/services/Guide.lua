@@ -75,6 +75,8 @@ function GuideService.GetGuide(guideID)
                 local slot = CatalogService.GetSlotInfo(guideID)
                 if (slot and slot.prefix == "External") then
                     print("|cFFFF4444[" .. addonTitle .. "]|r Falló la comprobación de integridad de los datos de la guía. Por favor, vuelve a descargar el contenido de las guías.")
+                else
+                    print("|cFFFF4444[" .. addonTitle .. "]|r Falló la comprobación de integridad de los datos de la guía. Por favor, reinstala el addon.")
                 end
             end
             return nil

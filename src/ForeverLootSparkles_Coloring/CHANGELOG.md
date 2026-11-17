@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.3
+
+- Less CPU use: whether an object belongs to a quest is now remembered until your quest log changes, instead of being looked up several times a second for every nameplate.
+
 ## 2.2.2
 
 - Fixed: soft targeting pause state was not reset when sparkles or safe self-cast were toggled (see BUGFIX.md).

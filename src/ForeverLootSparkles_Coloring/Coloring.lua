@@ -78,6 +78,7 @@ local function IsSecret(value)
 	return issecretvalue ~= nil and issecretvalue(value);
 end
 
+-- Calls that touch other units can error or return secret values; both count as "unknown"
 local function SafeCall(func, ...)
 	if not func then
 		return nil;
@@ -89,6 +90,26 @@ local function SafeCall(func, ...)
 	return result;
 end
 
+local function GetCVarValue(name)
+	local ok, value = pcall(C_CVar.GetCVar, name);
+	if ok then
+		return value;
+	end
+end
+
+-- Only touches cvars this client knows, and only when the value changes:
+-- CVAR_UPDATE is synchronous, so every write runs Blizzard's handlers tainted
+-- by this addon (seen as a GetAuraDataByIndex taint error from Edit Mode)
+local function SetCVarValue(name, value)
+	local current = GetCVarValue(name);
+	value = tostring(value);
+	if current == nil or current == value then
+		return;
+	end
+	pcall(C_CVar.SetCVar, name, value);
+end
+
+-- Cursor files (Interface\Cursor\*.blp) -> category
 local CURSOR_CATEGORY = {
 	Mine = "ore",
 	GatherHerbs = "herb",
@@ -96,6 +117,8 @@ local CURSOR_CATEGORY = {
 	Interact = "other", PickLock = "other", LootAll = "other", Pickup = "other",
 };
 
+-- The client returns a fileID, a path (Interface\Cursor\Mine) or an atlas name
+-- (Cursor_Crosshair_UnableMine_64), so keywords are searched in the string.
 local CURSOR_KEYWORDS = {
 	{ "gather", "herb" },
 	{ "mine", "ore" },
@@ -106,29 +129,33 @@ local CURSOR_KEYWORDS = {
 	{ "interact", "other" },
 };
 
-local cursorLookup = {};
-ns.cursorLookup = cursorLookup;
+local cursorLookup = {}; -- fileID -> { category, greyed out }
 if GetFileIDFromPath then
 	for name, category in pairs(CURSOR_CATEGORY) do
 		for _, prefix in ipairs({ "", "Unable" }) do
 			local path = "Interface\\Cursor\\" .. prefix .. name;
 			local id = SafeCall(GetFileIDFromPath, path) or SafeCall(GetFileIDFromPath, path .. ".blp");
 			if id then
-				cursorLookup[id] = category;
+				cursorLookup[id] = { category, prefix ~= "" };
 			end
 		end
 	end
 end
 
-local probe = UIParent:CreateTexture(nil, "BACKGROUND");
+local probe = UIParent:CreateTexture(nil, "BACKGROUND"); -- hidden, reads the cursor icon
 probe:Hide();
 
 local questTexts = {};
 local questsDirty = true;
+-- GUID -> quest related; the tooltip scan behind it is the expensive part of
+-- classifying and only changes with the quest log
+local questCache = {};
+local questCacheSize = 0;
+local QUEST_CACHE_LIMIT = 500;
 
 local function NormalizeText(text)
-	text = text:lower():gsub("\194\160", " ");
-	text = text:gsub("\226\128\153", "'");
+	text = text:lower():gsub("\194\160", " "); -- non-breaking space
+	text = text:gsub("\226\128\153", "'");     -- typographic apostrophe
 	text = text:gsub("%d+%s*/%s*%d+", "");
 	text = text:gsub("^[%s:%-]+", ""):gsub("[%s:%-]+$", "");
 	return text;
@@ -166,6 +193,8 @@ local function RebuildQuestTexts()
 	end
 end
 
+-- Is the object's name part of an unfinished objective ("Soaked Saw: 0/1"), or
+-- the objective part of its name ("Supplies" in "Crate of Supplies")?
 local function MatchesObjective(name)
 	if type(name) ~= "string" or IsSecret(name) or #name < 4 then
 		return false;
@@ -184,7 +213,7 @@ end
 
 local QUEST_LINE_TYPE = Enum and Enum.TooltipDataLineType and Enum.TooltipDataLineType.QuestObjective;
 
-local function IsQuestRelated(unit)
+local function CheckQuestRelated(unit, name)
 	if C_QuestLog and C_QuestLog.UnitIsRelatedToActiveQuest
 		and SafeCall(C_QuestLog.UnitIsRelatedToActiveQuest, unit) == true then
 		return true;
@@ -199,40 +228,94 @@ local function IsQuestRelated(unit)
 			end
 		end
 	end
-	return MatchesObjective(SafeCall(UnitName, unit));
+	return MatchesObjective(name or SafeCall(UnitName, unit));
 end
 
+local function IsQuestRelated(unit, name)
+	local guid = SafeCall(UnitGUID, unit);
+	if type(guid) ~= "string" then
+		return CheckQuestRelated(unit, name);
+	end
+	local related = questCache[guid];
+	if related == nil then
+		related = CheckQuestRelated(unit, name);
+		if questCacheSize >= QUEST_CACHE_LIMIT then
+			wipe(questCache);
+			questCacheSize = 0;
+		end
+		questCache[guid] = related;
+		questCacheSize = questCacheSize + 1;
+	end
+	return related;
+end
+
+local function QuestsChanged()
+	questsDirty = true;
+	wipe(questCache);
+	questCacheSize = 0;
+end
+
+-- Category and "greyed out" flag (Unable variant: can't interact right now) of a cursor name
 local function ReadCursorName(name)
 	if type(name) ~= "string" then
 		return nil;
 	end
 	name = name:lower();
+	local blocked = name:find("unable", 1, true) ~= nil;
 	for _, entry in ipairs(CURSOR_KEYWORDS) do
 		if name:find(entry[1], 1, true) then
-			return entry[2];
+			return entry[2], blocked;
 		end
 	end
+	return nil, blocked;
 end
 
-local function ClassifyObject(unit)
-	local category;
-	if SafeCall(SetUnitCursorTexture, probe, unit, nil, true) then
-		local texture = probe:GetTexture();
-		local atlas = probe.GetAtlas and probe:GetAtlas();
-		if IsSecret(texture) then
-			texture = nil;
-		end
-		if IsSecret(atlas) then
-			atlas = nil;
-		end
-		category = (type(texture) == "number" and cursorLookup[texture])
-			or ReadCursorName(texture) or ReadCursorName(atlas);
+-- The unit's cursor icon as fileID/path and atlas, secret values left out
+local function CursorTexture(unit)
+	if not SafeCall(SetUnitCursorTexture, probe, unit, nil, true) then
+		return nil;
 	end
-	if category ~= "ore" and category ~= "herb" and IsQuestRelated(unit) then
+	local texture = probe:GetTexture();
+	local atlas = probe.GetAtlas and probe:GetAtlas();
+	if IsSecret(texture) then
+		texture = nil;
+	end
+	if IsSecret(atlas) then
+		atlas = nil;
+	end
+	return texture, atlas;
+end
+
+-- Category of a world object and whether its cursor is greyed out. The cursor
+-- is read every time (it changes with range and skill), the quest check is cached.
+local function ClassifyObject(unit, name)
+	local category, blocked;
+	local texture, atlas = CursorTexture(unit);
+	local known = type(texture) == "number" and cursorLookup[texture];
+	if known then
+		category, blocked = known[1], known[2];
+	else
+		category, blocked = ReadCursorName(texture);
+		if not category then
+			local fromAtlas, atlasBlocked = ReadCursorName(atlas);
+			category, blocked = fromAtlas, blocked or atlasBlocked;
+		end
+	end
+	if category ~= "ore" and category ~= "herb" and IsQuestRelated(unit, name) then
 		category = "quest";
 	end
-	return category;
+	return category, blocked or false;
 end
+
+-- Shared with IconHider.lua and Sparkles.lua (loaded after this file)
+ns.IsSecret = IsSecret;
+ns.SafeCall = SafeCall;
+ns.GetCVarValue = GetCVarValue;
+ns.SetCVarValue = SetCVarValue;
+ns.cursorLookup = cursorLookup;
+ns.CursorTexture = CursorTexture;
+ns.ClassifyObject = ClassifyObject;
+ns.GOLD, ns.GREY = GOLD, GREY;
 
 -- The unit whose nameplate carries the sparkle
 local function UnitForPlate(plate)
@@ -277,9 +360,6 @@ function ns.KindOfUnit(unit)
 	end
 	return nil;
 end
-
-ns.SafeCall = SafeCall;
-ns.IsSecret = IsSecret;
 
 ---------------------------------------------------------------------------
 -- Painting
@@ -412,7 +492,7 @@ end
 local events = CreateFrame("Frame");
 events:SetScript("OnEvent", function(_, event)
 	if event == "QUEST_LOG_UPDATE" then
-		questsDirty = true;
+		QuestsChanged();
 	end
 	current.dirty = true;
 end);
