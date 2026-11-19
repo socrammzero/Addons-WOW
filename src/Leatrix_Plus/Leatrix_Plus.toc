@@ -7,7 +7,7 @@
 ## Notes-esES: Calidad de vida y mejoras para World of Warcraft.
 ## Notes-esMX: Calidad de vida y mejoras para World of Warcraft.
 
-## Version: 1.60.30
+## Version: 1.60.34
 ## Author: Leatrix
 ## SavedVariables: LeaPlusDB
 ## LoadSavedVariablesFirst: true

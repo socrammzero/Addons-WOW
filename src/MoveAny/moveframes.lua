@@ -87,6 +87,11 @@ end
 
 function MoveAny:HasExternalWorldMapDrag()
 	if maWorldMapExternalDrag then return true end
+	if MoveAny:IsAddOnLoaded("MapUtils") then
+		maWorldMapExternalDrag = true
+		return true
+	end
+
 	if maWorldMapOwned then return false end
 	if not C_Widget.IsWidget(WorldMapFrame) then return false end
 	local external = false
@@ -442,7 +447,7 @@ function MoveAny:UpdateMoveFrames(from, force, ts)
 						fm:SetMovable(true)
 						fm:SetUserPlaced(false)
 						if MAFRAMESIGNORECLAMP[name] == nil and MoveAny:IsEnabled("CLAMPWINDOWTOSCREEN", true) then MoveAny:SetClampedToScreen(fm, true, "UpdateMoveFrames 1") end
-						if (MoveAny:GetWoWBuild() ~= "RETAIL" and MoveAny:GetWoWBuild() ~= "CLASSIC" and MoveAny:GetWoWBuild() ~= "TBC" and MoveAny:GetWoWBuild() ~= "MISTS") and WorldMapFrame and WorldMapFrameMove then
+						if (MoveAny:GetWoWBuild() ~= "RETAIL" and MoveAny:GetWoWBuild() ~= "CLASSIC" and MoveAny:GetWoWBuild() ~= "TBC" and MoveAny:GetWoWBuild() ~= "MISTS") and WorldMapFrame and WorldMapFrameMove and not MoveAny:HasExternalWorldMapDrag() then
 							local offsetl = 15
 							local offsetr = 7
 							local offsett = 18

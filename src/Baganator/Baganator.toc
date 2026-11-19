@@ -5,7 +5,7 @@
 ## Title-esMX: Baganator
 ## Notes-esES: Gestor de inventario y bolsas para World of Warcraft.
 ## Notes-esMX: Gestor de inventario y bolsas para World of Warcraft.
-## Version: 862
+## Version: 865
 ## Author: plusmouse
 ## OptionalDeps: Syndicator, Masque
 ## SavedVariables: BAGANATOR_CONFIG, BAGANATOR_DATA
@@ -66,6 +66,7 @@ Transfers\AddToTrade.lua
 ItemViewCommon\Utilities.lua
 ItemViewCommon\Search.lua
 ItemViewCommon\Search.xml
+ItemViewCommon\Buttons.lua
 ItemViewCommon\ItemButton.lua
 ItemViewCommon\ItemButton.xml
 ItemViewCommon\Pools.lua
