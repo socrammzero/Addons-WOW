@@ -1342,6 +1342,71 @@ function GQ.Data:GetEntriesByItemId(itemId)
     return self.byItemId and self.byItemId[itemId] or {}
 end
 
+-- At most `limit` generic world drops for one slot at this level, class,
+-- faction, and spec. Packed catalogs replace this with a scan that builds
+-- only those rows. This fallback is the already-loaded class arrays.
+function GQ.Data:WorldDropSlotEntries(slotName, limit)
+    limit = limit or 10
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    local spec = GQ.GetEffectiveSpec and GQ:GetEffectiveSpec()
+    local level = (GQ.GetEffectiveLevel and GQ:GetEffectiveLevel()) or 1
+    local ranges = self.genericWorldDropRanges
+    if not classFile or not spec or type(ranges) ~= "table" then
+        return {}
+    end
+    local best = {}
+    local seen = {}
+    local function consider(entry)
+        if not entry or not entry.itemId or seen[entry.itemId] then
+            return
+        end
+        if type(ranges[entry.itemId]) ~= "table" then
+            return
+        end
+        if not self:EntryMatchesPlayer(entry) then
+            return
+        end
+        if level < (entry.minLevel or 1) or level > (entry.maxLevel or level) then
+            return
+        end
+        local fact = self:GetItemFact(entry.itemId)
+        local req = fact and fact.reqLevel
+        if type(req) == "number" and req > 1 and req > level then
+            return
+        end
+        seen[entry.itemId] = true
+        local score = entry.pipelineScore or 0
+        if #best >= limit and score <= (best[#best].pipelineScore or 0) then
+            return
+        end
+        best[#best + 1] = entry
+        table.sort(best, function(a, b)
+            return (a.pipelineScore or 0) > (b.pipelineScore or 0)
+        end)
+        if #best > limit then
+            best[limit + 1] = nil
+        end
+    end
+    local map = self.byClassSlotSpec and self.byClassSlotSpec[classFile]
+    local keys = self:GetCandidateSlotKeys(slotName) or { slotName }
+    for i = 1, #keys do
+        local slotMap = map and map[self:NormalizeSlotName(keys[i])]
+        local rows = slotMap and slotMap[spec]
+        if rows then
+            for r = 1, #rows do
+                consider(rows[r])
+            end
+        end
+        local anyRows = slotMap and slotMap._any
+        if anyRows then
+            for r = 1, #anyRows do
+                consider(anyRows[r])
+            end
+        end
+    end
+    return best
+end
+
 -- Searched in this order. Names, not a table built per call: list building
 -- runs this for every catalog entry. A nil table is skipped so a loaded
 -- class whose facts sit after an unloaded one is still found.
@@ -5317,6 +5382,7 @@ function GQ.Data:InvalidateQueryCache()
     self._linkEntryCache = nil
     self._scoreMissCache = nil
     self._unitGearCache = nil
+    self._unitGearWarmDone = nil
     if GQ.Log then
         GQ.Log._slotRankCache = nil
         GQ.Log._slotRankBand = nil
@@ -6351,10 +6417,68 @@ function GQ.Data:BestOffHandPartner()
     return best
 end
 
+function GQ.Data:BestDualWieldPartnerFor(excludeEntry)
+    local excludeId = excludeEntry and excludeEntry.itemId
+    local best
+    local second
+    for _, entry in ipairs(self:GetCandidatesForSlot("SecondaryHand") or {}) do
+        if type(entry.pipelineScore) == "number" and self:EntryIsDamagingWeapon(entry)
+            and not self:EntryIsTwoHand(entry)
+            and (not excludeId or entry.itemId ~= excludeId)
+        then
+            if not best or entry.pipelineScore > best.pipelineScore then
+                second = best
+                best = entry
+            elseif not second or entry.pipelineScore > second.pipelineScore then
+                second = entry
+            end
+        end
+    end
+    if excludeId and best and best.itemId == excludeId then
+        return second
+    end
+    return best
+end
+
+function GQ.Data:HunterDualWieldPairScore()
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile ~= "HUNTER" or not self:DualWieldReady() then
+        return nil
+    end
+    local first
+    local second
+    for _, entry in ipairs(self:GetCandidatesForSlot("SecondaryHand") or {}) do
+        if type(entry.pipelineScore) == "number" and self:EntryIsDamagingWeapon(entry)
+            and not self:EntryIsTwoHand(entry)
+        then
+            if not first or entry.pipelineScore > first.pipelineScore then
+                second = first
+                first = entry
+            elseif not second or entry.pipelineScore > second.pipelineScore then
+                second = entry
+            end
+        end
+    end
+    if not first then
+        return 0
+    end
+    if not second then
+        return first.pipelineScore or 0
+    end
+    return (first.pipelineScore or 0) + (second.pipelineScore or 0)
+end
+
 function GQ.Data:BestOneHandPartner()
     local ctx = self.GetActiveBandCacheKey and self:GetActiveBandCacheKey() or ""
     if self._onePartnerBand == ctx then
         return self._onePartnerEntry
+    end
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile == "HUNTER" and self:DualWieldReady() then
+        local hunterBest = self:BestDualWieldPartnerFor(nil)
+        self._onePartnerBand = ctx
+        self._onePartnerEntry = hunterBest
+        return hunterBest
     end
     local list = self:GetCandidatesForSlot("MainHand") or {}
     if #list == 0 then
@@ -6391,8 +6515,14 @@ function GQ.Data:BestWeaponLoadoutScore()
             end
         end
     end
-    local partner = self:BestOffHandPartner()
-    local pair = bestOne + ((partner and partner.pipelineScore) or 0)
+    local pair
+    local classFile = GQ.GetEffectiveClass and GQ:GetEffectiveClass()
+    if classFile == "HUNTER" and self:DualWieldReady() then
+        pair = self:HunterDualWieldPairScore() or 0
+    else
+        local partner = self:BestOffHandPartner()
+        pair = bestOne + ((partner and partner.pipelineScore) or 0)
+    end
     local best = bestTwo > pair and bestTwo or pair
     self._loadoutBand = ctx
     self._loadoutBest = best
@@ -6425,7 +6555,7 @@ function GQ.Data:WeaponLoadoutPipelineDelta(entry)
     if isTwo then
         candidate = entry.pipelineScore
     elseif mainIsTwo and slot == "SecondaryHand" then
-        local one = self:BestOneHandPartner()
+        local one = self:BestDualWieldPartnerFor(entry)
         candidate = entry.pipelineScore + ((one and one.pipelineScore) or 0)
     elseif mainIsTwo then
         local off = self:BestOffHandPartner()
@@ -7082,7 +7212,7 @@ function GQ.Data:GearScoreTrail(entry, ctx)
 end
 
 function GQ.Data:GearScoreTooltipLine(entry)
-    if GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
+    if not GQ._tooltipsPanelPreview and GQ.IsPreviewEnabled and GQ:IsPreviewEnabled() then
         return L["|cffb0b0b0Turn off simulation mode to see your GearQuest Score for this item|r"]
     end
     if not entry then

@@ -15,7 +15,7 @@ local FOLD_INTO = {
     spellCrit = "crit", critRanged = "crit",
     spellHaste = "haste",
 }
-local DEAD_STAT = { expertise = true, armorPen = true, resilience = true }
+local DEAD_STAT = { armorPen = true, resilience = true }
 
 local FIELDS = {
     { key = "dpsWeight", label = "Weapon DPS", weapon = true },
@@ -249,6 +249,45 @@ function GQ.Custom:Weights(classFile, record, level)
             + 2 * (weights.armor or 0)
             + (weights.dodge or 0) / 20
             + (weights.crit or 0) / 20
+    end
+    local healers = HEALER_SPEC[classFile]
+    if not (healers and healers[record.base]) then
+        if not typed.heal then
+            weights.heal = 0
+        end
+        if not typed.sp_from_heal then
+            weights.sp_from_heal = 0
+        end
+    end
+    return weights, dps, dpsRanged, speed
+end
+
+-- Raw grid weights for the spec tooltip (matches pipeline / Google Sheet).
+function GQ.Custom:SheetWeights(classFile, record)
+    local shipped = self:Shipped(classFile, record.base)
+    if not shipped then
+        return {}, 0, 0, 0
+    end
+    local weights = {}
+    for key, value in pairs(shipped.weights) do
+        weights[key] = value
+    end
+    local dps = shipped.dpsWeight
+    local dpsRanged = shipped.dpsWeightRanged
+    local speed = shipped.speedWeight
+    local overrides = record.overrides or {}
+    local typed = {}
+    for key, value in pairs(overrides) do
+        if key == "dpsWeight" then
+            dps = value
+        elseif key == "dpsWeightRanged" then
+            dpsRanged = value
+        elseif key == "speedWeight" then
+            speed = value
+        elseif type(value) == "number" then
+            weights[key] = value
+            typed[key] = true
+        end
     end
     local healers = HEALER_SPEC[classFile]
     if not (healers and healers[record.base]) then

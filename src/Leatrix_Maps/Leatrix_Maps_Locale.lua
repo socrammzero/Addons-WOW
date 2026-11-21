@@ -1538,6 +1538,22 @@ if GameLocale == "esES" then
 
 	L["Redridge Pass"] = "Paso de Crestagrana"
 	L["The Hidden Reach (requires Crescent Key)"] = "El Tramo Oculto (requiere Llave creciente)"
+	L["Blackmaw Grove"] = "Arboleda Faucenegra"
+	L["Festering Grotto"] = "Gruta Supurante"
+	L["Depths of the Fallen Grove"] = "Profundidades de la Arboleda Caída"
+	L["Depths of the Elders"] = "Profundidades de los Ancestros"
+	L["Depths of the Burrow"] = "Profundidades de la Madriguera"
+	L["Depths of Forbidden Magic"] = "Profundidades de la Magia Prohibida"
+	L["Impaan the Imprisoner"] = "Impaan el Carcelero"
+	L["Bonesnout the Unbroken"] = "Hocicohueso el Indomable"
+	L["Withermaw"] = "Fauce Marchita"
+	L["Unbound Spirit"] = "Espíritu desatado"
+	L["Elder Shaman Bloodmane"] = "Chamán anciano Crin Sangrienta"
+	L["Blackmaw Behemoth"] = "Behemoth Faucenegra"
+	L["Varrox Bleakhoof"] = "Varrox Pezuña Sombría"
+	L["Spawns in one of %d places."] = "Aparece en uno de %d lugares."
+	L["These rares may not spawn. If one does, it will be in one of %d places."] = "Es posible que estos raros no aparezcan. Si aparece uno, estará en uno de %d lugares."
+	L["May not spawn. If it does, it will be in one of %d places."] = "Es posible que no aparezca. Si lo hace, estará en uno de %d lugares."
 end
 
 ----------------------------------------------------------------------
@@ -2283,6 +2299,22 @@ if GameLocale == "esMX" then
 
 	L["Redridge Pass"] = "Paso de Crestagrana"
 	L["The Hidden Reach (requires Crescent Key)"] = "El Tramo Oculto (requiere Llave creciente)"
+	L["Blackmaw Grove"] = "Arboleda Faucenegra"
+	L["Festering Grotto"] = "Gruta Supurante"
+	L["Depths of the Fallen Grove"] = "Profundidades de la Arboleda Caída"
+	L["Depths of the Elders"] = "Profundidades de los Ancestros"
+	L["Depths of the Burrow"] = "Profundidades de la Madriguera"
+	L["Depths of Forbidden Magic"] = "Profundidades de la Magia Prohibida"
+	L["Impaan the Imprisoner"] = "Impaan el Carcelero"
+	L["Bonesnout the Unbroken"] = "Hocicohueso el Indomable"
+	L["Withermaw"] = "Fauce Marchita"
+	L["Unbound Spirit"] = "Espíritu desatado"
+	L["Elder Shaman Bloodmane"] = "Chamán anciano Crin Sangrienta"
+	L["Blackmaw Behemoth"] = "Behemoth Faucenegra"
+	L["Varrox Bleakhoof"] = "Varrox Pezuña Sombría"
+	L["Spawns in one of %d places."] = "Aparece en uno de %d lugares."
+	L["These rares may not spawn. If one does, it will be in one of %d places."] = "Es posible que estos raros no aparezcan. Si aparece uno, estará en uno de %d lugares."
+	L["May not spawn. If it does, it will be in one of %d places."] = "Es posible que no aparezca. Si lo hace, estará en uno de %d lugares."
 end
 
 ----------------------------------------------------------------------

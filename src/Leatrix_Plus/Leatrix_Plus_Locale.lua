@@ -2190,6 +2190,7 @@ if GameLocale == "esES" then
 	L["Zul'Gurub"] = "Zul'Gurub"
 	L["Zygor addon not found."] = "No se encuentra el addon Zygor."
 
+	L["Cannot be used with EllesmereUI"] = "No se puede usar con EllesmereUI"
 end
 
 ----------------------------------------------------------------------
@@ -3279,6 +3280,7 @@ if GameLocale == "esMX" then
 	L["Zul'Gurub"] = "Zul'Gurub"
 	L["Zygor addon not found."] = "No se encuentra el addon Zygor."
 
+	L["Cannot be used with EllesmereUI"] = "No se puede usar con EllesmereUI"
 end
 
 ----------------------------------------------------------------------
